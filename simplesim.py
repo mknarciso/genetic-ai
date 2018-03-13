@@ -3,13 +3,15 @@
 import os
 import random
 
+import numpy as np
+
 #Import the Turtle module
 import turtle
 turtle.setup( width = 700, height = 700, startx = 0, starty = 0)
 #Required by MacOSX to show the window
 turtle.fd(0)
 #Set the animations speed to the maximum
-turtle.speed(0)
+turtle.speed(10)
 #Change the background color
 turtle.bgcolor("black")
 #Hide the default turtle
@@ -17,9 +19,16 @@ turtle.ht()
 #This saves memory
 turtle.setundobuffer(1)
 #This speeds up drawing
-turtle.tracer(1)
+# # To show playable animation
+# turtle.tracer(1)
+# To speedup evolution
+turtle.tracer(0,0)
 
-
+# sigmoid function
+def sig(x,deriv=False):
+    if(deriv==True):
+        return x*(1-x)
+    return 1/(1+np.exp(-x))
 
 def aspect_angle(from_t, to_t):
 	aa = float(to_t.heading() - from_t.towards(to_t))
@@ -41,6 +50,11 @@ def distance_score(blue, red):
 def aa_score(blue, red):
 	return abs(aspect_angle(red,blue))-abs(aspect_angle(blue,red))
 
+def game_over(player):
+	if player.fuel <= 0:
+		return True
+	return False
+
 class Sprite(turtle.Turtle):
 	def __init__(self, spriteshape, color, startx, starty, heading):
 		turtle.Turtle.__init__(self, shape = spriteshape)
@@ -54,6 +68,7 @@ class Sprite(turtle.Turtle):
 		
 	def move(self):
 		self.fd(self.speed)
+		self.fuel -= 1
 		
 		#Boundary detection
 		if self.xcor() > 290:
@@ -92,8 +107,8 @@ class Sprite(turtle.Turtle):
 class Player(Sprite):
 	def __init__(self, spriteshape, color, startx, starty, heading):
 		Sprite.__init__(self, spriteshape, color, startx, starty, heading)
-		self.speed = 0.3
-		self.fuel = 30000
+		self.speed = 1
+		self.fuel = 570
 
 	def turn_left(self):
 		self.lt(2)
@@ -137,34 +152,86 @@ class Game():
 		
 	def show_status(self, blue, red):
 		self.pen.undo()
-		msg = "[Blue]%+7.2f | %.3f \n[ Red]%+7.2f \n[Advg]%+7.2f | %.3f \n[Scor]%+7.2f" % ( aspect_angle(blue,red), distance_score(blue,red), aspect_angle(red,blue), aa_score(blue,red), aa_score(blue,red)/180, self.score )
+		msg = "[Fuel]%7d \n[Blue]%+7.2f | %.3f \n[ Red]%+7.2f \n[Advg]%+7.2f | %.3f \n[Scor]%+7.2f" % (blue.fuel, aspect_angle(blue,red), distance_score(blue,red), aspect_angle(red,blue), aa_score(blue,red), aa_score(blue,red)/180, self.score )
 		self.pen.penup()
 		self.pen.goto(-290,-290)
 		self.pen.write(msg, font=("Courier", 16, "normal"))
 
-#Create game object
-game = Game()
+#Autopilot
+def aulopilot(me, enemy, game, dna0, dna1):
+	p = np.zeros(14)
+	# Ativacao
+	p[0] = 1
+	# Parametros
+	p[1] = float(me.xcor())/300
+	p[2] = float(me.ycor())/300
+	p[3] = np.sin(me.heading()*np.pi/180)
+	p[4] = np.cos(me.heading()*np.pi/180)
+	p[5] = float(me.distance(enemy))/300
+	p[6] = np.sin(me.towards(enemy)*np.pi/180)
+	p[7] = np.cos(me.towards(enemy)*np.pi/180)
+	p[8] = float(aspect_angle(me, enemy))/180
+	p[9] = float(aspect_angle(enemy, me))/180
+	p[10] = float(distance_score(me, enemy))
+	p[11] = float(aa_score(me, enemy))/180
+	p[12] = float(me.fuel)/2000
+	p[13] = float(game.score)/2000
+	
+	l1 = sig(np.dot(p,dna0))
+	l2 = sig(np.dot(l1,dna1))
 
-#Draw the game border
-game.draw_border()
+	if l2[0]>l2[1] and l2[0]>l2[2]:
+		me.turn_left()
+		# print("Left")
+	if l2[2]>l2[0] and l2[2]>l2[1]:
+		me.turn_right()
+		# print("Right")
 
-#Create my sprites
-player = Player("triangle", "blue", 0, -280, 90)
-enemy = Player("triangle", "red", 0, 280, 270)
+	# print(l2)
 
-#Keyboard bindings
-turtle.onkey(player.turn_left, "Left")
-turtle.onkey(player.turn_right, "Right")
-turtle.onkey(player.accelerate, "Up")
-turtle.onkey(player.decelerate, "Down")
-turtle.listen()
-
-#Main game loop
+counter = 0
+generation = 0
+element = 0
 while True:
-	player.move()
-	enemy.move()
-	game.update_score(player,enemy)
-	game.show_status(player,enemy)
+	#Create game object
+	game = Game()
 
-delay = raw_input("Press enter to finish. > ")
+	#Draw the game border
+	game.draw_border()
+
+	#Create my sprites
+	player = Player("triangle", "blue", 0, -280, 90)
+	enemy = Player("triangle", "red", 0, 280, 270)
+
+	#Keyboard bindings
+	turtle.onkey(enemy.turn_left, "Left")
+	turtle.onkey(enemy.turn_right, "Right")
+	turtle.onkey(enemy.accelerate, "Up")
+	turtle.onkey(enemy.decelerate, "Down")
+	turtle.listen()
+
+	#Genetic properties
+	np.random.seed(counter)
+	dna0 = 2*np.random.random((14,10)) - 1
+	dna1 = 2*np.random.random((10,3)) - 1
+
+	#Main game loop
+	while not game_over(player):
+		aulopilot(player,enemy,game,dna0,dna1)
+		player.move()
+		enemy.move()
+		game.update_score(player,enemy)
+		# # To show playable animation
+		#game.show_status(player,enemy)
+		# To show quick animation
+		if counter:
+			turtle.update()
+
+	print("Final Score: " + str(game.score))
+	turtle.reset()
+	player.reset()
+	enemy.reset()
+	counter += 1
+
+	# delay = raw_input("Press enter to go. > ")
 
