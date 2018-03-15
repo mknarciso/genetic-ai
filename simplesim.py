@@ -1,5 +1,9 @@
 # BVR Learning
 
+## binding.pry
+#  import code; code.interact(local=dict(globals(), **locals()))
+
+
 import os
 import random
 import numpy as np 		# Mathematical library
@@ -13,9 +17,9 @@ L1 = 10
 L2 = 3 	 # Outputs
 
 # Genetics
-GENERATIONS = 10
+GENERATIONS = 20
 SPECIES = 12
-SURVIVALS = 3
+SURVIVORS = 3
 MUTATION = 0.05
 SEED = 0
 # Tactical
@@ -200,8 +204,36 @@ def aulopilot(me, enemy, game, dna0, dna1):
 	if l2[2]>l2[0] and l2[2]>l2[1]:
 		me.turn_right()
 		# print("Right")
-
 	# print(l2)
+
+# Natural selection =D
+def select(scores,survivors):
+	#res = np.array(survivors)
+	# import code; code.interact(local=dict(globals(), **locals()))
+	amp = np.amax(scores)-np.amin(scores)
+	points = (scores - np.amin(scores))/amp
+	prob = points / np.sum(points)
+	if len(prob) < survivors:
+		return np.random.choice(len(scores), survivors, replace=True, p=prob)
+	elif len(prob)==0:
+		return np.random.choice(len(scores), survivors, replace=False)
+	else:
+		return np.random.choice(len(scores), survivors, replace=False, p=prob)
+
+def breed(mates, survivors, species, mutation):
+	# import code; code.interact(local=dict(globals(), **locals()))
+	# mates = np.split(dnas,survivors)
+	dna_size = (L0*L1+L1*L2)
+	new_generation = np.zeros((SPECIES,dna_size))
+	i = 0
+	for j in range(survivors):
+		new_generation[j]=mates[j]
+		i+=1
+	for j in range(i,species):
+		t = np.random.choice(len(mates), 2, replace=False)
+		new_generation[j]=np.where(np.random.choice([True,False], dna_size),mates[t[0]] , mates[t[1]])
+	return new_generation
+
 
 counter = 0
 generation = 0
@@ -209,9 +241,11 @@ element = 0
 
 ## Initial DNA
 np.random.seed(SEED)
-dnas = 2*np.random.random((SPECIES,(L0*L1+L1*L2))) - 1 # zero mean
+dna_size = (L0*L1+L1*L2)
+dnas = 2*np.random.random((SPECIES,dna_size)) - 1 # zero mean
 
 for generation in range(GENERATIONS):
+	scores = np.zeros(SPECIES)
 	for specie in range(SPECIES): 
 		#Create game object
 		game = Game()
@@ -244,14 +278,21 @@ for generation in range(GENERATIONS):
 			# # To show playable animation
 			#game.show_status(player,enemy)
 			# To show quick animation
-			# if counter%5==0:
-			# 	turtle.update()
-
+			if counter%24==0:
+				turtle.update()
+		scores[specie] = game.score
 		print("Final Score: " + str("%9.2f" % game.score) + " [GEN] "+ str(generation)+ " [#] "+ str(specie))
+		
 		turtle.reset()
 		player.reset()
 		enemy.reset()
 		counter += 1
-
+	# import code; code.interact(local=dict(globals(), **locals()))
+	selected = select(scores,SURVIVORS)
+	selected_dnas = np.zeros((SURVIVORS,dna_size))
+	for i, mate_number in enumerate(selected):
+		selected_dnas[i]=dnas[mate_number]
+	dnas = breed(selected_dnas, SURVIVORS, SPECIES, MUTATION)
+	print "Selected: " + str(selected)
 	# delay = raw_input("Press enter to go. > ")
 
