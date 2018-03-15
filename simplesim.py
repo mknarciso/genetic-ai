@@ -2,11 +2,25 @@
 
 import os
 import random
+import numpy as np 		# Mathematical library
+import turtle 			# Graphics library
 
-import numpy as np
+## Constants
 
-#Import the Turtle module
-import turtle
+# Model
+L0 = 14  # Inputs
+L1 = 10
+L2 = 3 	 # Outputs
+
+# Genetics
+GENERATIONS = 10
+SPECIES = 12
+SURVIVALS = 3
+MUTATION = 0.05
+SEED = 0
+# Tactical
+FUEL = 570
+
 turtle.setup( width = 700, height = 700, startx = 0, starty = 0)
 #Required by MacOSX to show the window
 turtle.fd(0)
@@ -108,7 +122,7 @@ class Player(Sprite):
 	def __init__(self, spriteshape, color, startx, starty, heading):
 		Sprite.__init__(self, spriteshape, color, startx, starty, heading)
 		self.speed = 1
-		self.fuel = 570
+		self.fuel = FUEL
 
 	def turn_left(self):
 		self.lt(2)
@@ -147,8 +161,8 @@ class Game():
 	def update_score(self, blue, red):
 		if distance_score(blue,red) > 0.3:
 			self.score += (aa_score(blue,red)/180)*(distance_score(blue,red))
-		# if blue.is_desertor:
-		# 	self.score -= 50
+		if blue.is_desertor():
+			self.score -= 50
 		
 	def show_status(self, blue, red):
 		self.pen.undo()
@@ -192,46 +206,52 @@ def aulopilot(me, enemy, game, dna0, dna1):
 counter = 0
 generation = 0
 element = 0
-while True:
-	#Create game object
-	game = Game()
 
-	#Draw the game border
-	game.draw_border()
+## Initial DNA
+np.random.seed(SEED)
+dnas = 2*np.random.random((SPECIES,(L0*L1+L1*L2))) - 1 # zero mean
 
-	#Create my sprites
-	player = Player("triangle", "blue", 0, -280, 90)
-	enemy = Player("triangle", "red", 0, 280, 270)
+for generation in range(GENERATIONS):
+	for specie in range(SPECIES): 
+		#Create game object
+		game = Game()
 
-	#Keyboard bindings
-	turtle.onkey(enemy.turn_left, "Left")
-	turtle.onkey(enemy.turn_right, "Right")
-	turtle.onkey(enemy.accelerate, "Up")
-	turtle.onkey(enemy.decelerate, "Down")
-	turtle.listen()
+		#Draw the game border
+		game.draw_border()
 
-	#Genetic properties
-	np.random.seed(counter)
-	dna0 = 2*np.random.random((14,10)) - 1
-	dna1 = 2*np.random.random((10,3)) - 1
+		#Create my sprites
+		player = Player("triangle", "blue", 0, -280, 90)
+		enemy = Player("triangle", "red", 0, 280, 270)
 
-	#Main game loop
-	while not game_over(player):
-		aulopilot(player,enemy,game,dna0,dna1)
-		player.move()
-		enemy.move()
-		game.update_score(player,enemy)
-		# # To show playable animation
-		#game.show_status(player,enemy)
-		# To show quick animation
-		if counter:
-			turtle.update()
+		#Keyboard bindings
+		turtle.onkey(enemy.turn_left, "Left")
+		turtle.onkey(enemy.turn_right, "Right")
+		turtle.onkey(enemy.accelerate, "Up")
+		turtle.onkey(enemy.decelerate, "Down")
+		turtle.listen()
 
-	print("Final Score: " + str(game.score))
-	turtle.reset()
-	player.reset()
-	enemy.reset()
-	counter += 1
+		#Genetic properties 
+		dna = dnas[specie]
+		dna0 = np.reshape(dna[0:(L0*L1)], (L0,L1))
+		dna1 = np.reshape(dna[(L0*L1):],(L1,L2))
+
+		#Main game loop
+		while not game_over(player):
+			aulopilot(player,enemy,game,dna0,dna1)
+			game.update_score(player,enemy)
+			player.move()
+			enemy.move()
+			# # To show playable animation
+			#game.show_status(player,enemy)
+			# To show quick animation
+			# if counter%5==0:
+			# 	turtle.update()
+
+		print("Final Score: " + str("%9.2f" % game.score) + " [GEN] "+ str(generation)+ " [#] "+ str(specie))
+		turtle.reset()
+		player.reset()
+		enemy.reset()
+		counter += 1
 
 	# delay = raw_input("Press enter to go. > ")
 
