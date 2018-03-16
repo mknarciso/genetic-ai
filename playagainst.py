@@ -249,84 +249,44 @@ def breed(mates, survivors, species, mutation):
 def mutate(dna,mutation):
 	return np.where(np.random.choice([True,False], DNA_SIZE, p=[1-mutation, mutation]), dna , 2*np.random.random(DNA_SIZE)-1)
 
-counter = 0
-generation = 0
-element = 0
+while True:
+	#Create game object
+	game = Game()
 
-## Initial DNA
-np.random.seed(SEED)
+	#Draw the game border
+	game.draw_border()
 
-dnas = 2*np.random.random((SPECIES,DNA_SIZE)) - 1 # zero mean
-actual_best = np.zeros(DNA_SIZE)
-for generation in range(GENERATIONS):
-	scores = np.zeros(SPECIES)
-	for specie in range(SPECIES): 
-		#Create game object
-		game = Game()
+	#Create my sprites
+	player = Player("triangle", "blue", 0, -280, 90)
+	enemy = Player("triangle", "red", 0, 280, 270)
 
-		#Draw the game border
-		game.draw_border()
+	#Keyboard bindings
+	turtle.onkey(player.turn_left, "Left")
+	turtle.onkey(player.turn_right, "Right")
+	turtle.onkey(player.accelerate, "Up")
+	turtle.onkey(player.decelerate, "Down")
+	turtle.listen()
 
-		#Create my sprites
-		player = Player("triangle", "blue", 0, -280*(1-2*counter%2), 180-90*(1-2*counter%2))
-		enemy = Player("triangle", "red", 0, 280*(1-2*counter%2), 180+90*(1-2*counter%2))
+	# #Use saved pilot
+	b = np.loadtxt('save.txt', dtype=float)
+	b0 = np.reshape(b[0:(L0*L1)], (L0,L1))
+	b1 = np.reshape(b[(L0*L1):(L0*L1)+(L1*L2)],(L1,L2))
+	b2 = np.reshape(b[(L0*L1)+(L1*L2):],(L2,L3))
 
-		#Keyboard bindings
-		turtle.onkey(enemy.turn_left, "Left")
-		turtle.onkey(enemy.turn_right, "Right")
-		turtle.onkey(enemy.accelerate, "Up")
-		turtle.onkey(enemy.decelerate, "Down")
-		turtle.listen()
+	#Main game loop
+	while not game_over(player):
+		# aulopilot(player,enemy,game,dna0,dna1,dna2)
+		aulopilot(enemy,player,game,b0,b1,b2) # using saved for enemy
+		game.update_score(player,enemy)
+		player.move()
+		enemy.move()
+		# # To show playable animation
+		game.show_status(player,enemy)
+		# To show quick animation
+		turtle.update()		
+	print("Final Score: " + str("%9.2f" % game.score))
+	
+	turtle.reset()
+	player.reset()
+	enemy.reset()
 
-		#Genetic properties 
-		dna = dnas[specie]
-		dna0 = np.reshape(dna[0:(L0*L1)], (L0,L1))
-		dna1 = np.reshape(dna[(L0*L1):(L0*L1)+(L1*L2)],(L1,L2))
-		dna2 = np.reshape(dna[(L0*L1)+(L1*L2):],(L2,L3))
-
-		# #Use saved pilot
-		b = np.loadtxt('save.txt', dtype=float)
-		b0 = np.reshape(b[0:(L0*L1)], (L0,L1))
-		b1 = np.reshape(b[(L0*L1):(L0*L1)+(L1*L2)],(L1,L2))
-		b2 = np.reshape(b[(L0*L1)+(L1*L2):],(L2,L3))
-
-		#Main game loop
-		while not game_over(player):
-			aulopilot(player,enemy,game,dna0,dna1,dna2)
-			aulopilot(enemy,player,game,b0,b1,b2) # using saved for enemy
-			game.update_score(player,enemy)
-			player.move()
-			enemy.move()
-			# # To show playable animation
-			#game.show_status(player,enemy)
-			# To show quick animation
-			if counter%150==0:
-				turtle.update()
-		scores[specie] = game.score
-		print("Final Score: " + str("%9.2f" % game.score) + " [GEN] "+ str(generation)+ " [#] "+ str(specie))
-		
-		turtle.reset()
-		player.reset()
-		enemy.reset()
-		counter += 1
-	# import code; code.interact(local=dict(globals(), **locals()))
-	selected = select(scores,SURVIVORS)
-	selected_dnas = np.zeros((SURVIVORS,DNA_SIZE))
-	for i, mate_number in enumerate(selected):
-		selected_dnas[i]=dnas[mate_number]
-	# Dynamic mutation
-	if np.amax(scores)<0:
-		dyn_mut = 0.75
-	elif np.amax(scores)<1:
-		dyn_mut = 0.5
-	else:
-		dyn_mut = 0.9/np.amax(scores)
-	actual_best = dnas[np.argmax(scores)]
-	dnas = breed(selected_dnas, SURVIVORS, SPECIES, dyn_mut)
-	print "Selected: " + str(selected)
-	# delay = raw_input("Press enter to go. > ")
-
-
-a = actual_best
-np.savetxt('save.txt', a, fmt='%f')
-print "Saved: " + str(actual_best)
