@@ -8,20 +8,23 @@ import os
 import random
 import numpy as np 		# Mathematical library
 import turtle 			# Graphics library
+import autopilot as ap
+import genetics as gen
 
 ## Constants
 
 # Model
-L0 = 14  # Inputs
-L1 = 10
-L2 = 5
-L3 = 3 	 # Outputs
-DNA_SIZE = (L0*L1+L1*L2+L2*L3)
+l = [14,10,5,3]
+# l[0] = 14  # Inputs
+# l[1] = 10
+# l[2] = 5
+# l[3] = 3 	 # Outputs
+DNA_SIZE = (l[0]*l[1]+l[1]*l[2]+l[2]*l[3])
 
 # Genetics
 GENERATIONS = 15
-SPECIES = 20
-SURVIVORS = 5
+SPECIES = 15
+SURVIVORS = 4
 MUTATION = 0.05
 SEED = 2
 # Tactical
@@ -44,11 +47,9 @@ turtle.setundobuffer(1)
 # To speedup evolution
 turtle.tracer(0,0)
 
-# sigmoid function
-def sig(x,deriv=False):
-    if(deriv==True):
-        return x*(1-x)
-    return 1/(1+np.exp(-x))
+np.random.seed(SEED)
+
+
 
 def aspect_angle(from_t, to_t):
 	aa = float(to_t.heading() - from_t.towards(to_t))
@@ -75,6 +76,16 @@ def game_over(player):
 		return True
 	return False
 
+def manual_control(who):
+		# turtle.onkey(enemy.update_state([1,0]), "Left")
+		# turtle.onkey(enemy.update_state([0,1]), "Right")
+	#Keyboard bindings
+	turtle.onkey(who.turn_left, "Left")
+	turtle.onkey(who.turn_right, "Right")
+	turtle.onkey(who.accelerate, "Up")
+	turtle.onkey(who.decelerate, "Down")
+	turtle.listen()
+
 class Sprite(turtle.Turtle):
 	def __init__(self, spriteshape, color, startx, starty, heading):
 		turtle.Turtle.__init__(self, shape = spriteshape)
@@ -86,49 +97,23 @@ class Sprite(turtle.Turtle):
 		self.seth(heading)
 		self.speed = 1
 		
-	def move(self):
-		self.fd(self.speed)
-		self.fuel -= 1
-		
-		#Boundary detection
-		# if self.xcor() > 290:
-		# 	self.setx(290)
-		# 	self.rt(60)
-		
-		# if self.xcor() < -290:
-		# 	self.setx(-290)
-		# 	self.rt(60)
-		
-		# if self.ycor() > 290:
-		# 	self.sety(290)
-		# 	self.rt(60)
-		
-		# if self.ycor() < -290:
-		# 	self.sety(-290)
-		# 	self.rt(60)
-
-	def is_desertor(self):
-		
-		#Boundary detection
-		# if self.xcor() > 290:
-		# 	return True
-		
-		# if self.xcor() < -290:
-		# 	return True
-		
-		# if self.ycor() > 290:
-		# 	return True
-		
-		# if self.ycor() < -290:
-		# 	return True
-
-		return False
 				
 class Player(Sprite):
 	def __init__(self, spriteshape, color, startx, starty, heading):
 		Sprite.__init__(self, spriteshape, color, startx, starty, heading)
 		self.speed = 1
 		self.fuel = FUEL
+		self.state = np.zeros(2)
+
+	def update_state(self,state):
+		self.state = state
+		# print(self.state)
+
+	def process_state(self):
+		if self.state[0]==1:
+			self.turn_left()
+		if self.state[1]==1:
+			self.turn_right()
 
 	def turn_left(self):
 		self.lt(2)
@@ -142,13 +127,15 @@ class Player(Sprite):
 	def decelerate(self):
 		self.speed -= 0.5
 
+	def move(self):
+		self.process_state()
+		self.fd(self.speed)
+		self.fuel -= 1
+
 class Game():
 	def __init__(self):
-		self.level = 1
 		self.score = 0
-		self.state = "playing"
 		self.pen = turtle.Turtle()
-		self.lives = 3
 		
 	def draw_border(self):
 		#Draw border
@@ -167,22 +154,20 @@ class Game():
 	def update_score(self, blue, red):
 		# target score
 		radius = blue.distance(0,0)
-		if radius<100:
-			self.score += (100-radius)/600
+		# if radius<100:
+		# 	self.score += (100-radius)/600
 		if distance_score(blue,red) > 0.3:
 			self.score += (aa_score(blue,red)/180)*(distance_score(blue,red))
-		if blue.is_desertor():
-			self.score -= 50
 		
 	def show_status(self, blue, red):
+		# self.pen.reset()
 		self.pen.undo()
 		msg = "[Fuel]%7d \n[Blue]%+7.2f | %.3f \n[ Red]%+7.2f \n[Advg]%+7.2f | %.3f \n[Scor]%+7.2f" % (blue.fuel, aspect_angle(blue,red), distance_score(blue,red), aspect_angle(red,blue), aa_score(blue,red), aa_score(blue,red)/180, self.score )
 		self.pen.penup()
 		self.pen.goto(-290,-290)
 		self.pen.write(msg, font=("Courier", 16, "normal"))
 
-#Autopilot
-def aulopilot(me, enemy, game, dna0, dna1, dna2):
+def flight_params(me, enemy, game):
 	p = np.zeros(14)
 	# Ativacao
 	p[0] = 1
@@ -201,106 +186,58 @@ def aulopilot(me, enemy, game, dna0, dna1, dna2):
 	p[12] = float(aa_score(me, enemy))/180
 	# p[12] = float(me.fuel)/2000
 	p[13] = float(game.score)/2000
-	
-	l1 = sig(np.dot(p,dna0))
-	l2 = sig(np.dot(l1,dna1))
-	l3 = sig(np.dot(l2,dna2))
-
-	if l3[0]>l3[1] and l3[0]>l3[2]:
-		me.turn_left()
-		# print("Left")
-	if l3[2]>l3[0] and l3[2]>l3[1]:
-		me.turn_right()
-		# print("Right")
-	# print(l3)
-
-# Natural selection =D
-def select(scores,survivors):
-	#res = np.array(survivors)
-	# import code; code.interact(local=dict(globals(), **locals()))
-	amp = np.amax(scores)-np.amin(scores)
-	points = (scores - np.amin(scores))/amp
-	prob = points*points / np.sum(np.power(points,2))
-	# import code; code.interact(local=dict(globals(), **locals()))
-	nz = prob[prob != 0.]
-	if amp<0.1:
-		return np.random.choice(len(scores), survivors, replace=False)
-	elif len(nz) >= survivors:
-		return np.random.choice(len(scores), survivors, replace=False, p=prob)
-	elif len(nz)>0:
-		return np.random.choice(len(scores), survivors, replace=True, p=prob)
-	else:
-		return np.random.choice(len(scores), survivors, replace=False)
-
-def breed(mates, survivors, species, mutation):
-	# import code; code.interact(local=dict(globals(), **locals()))
-	# mates = np.split(dnas,survivors)
-	new_generation = np.zeros((SPECIES,DNA_SIZE))
-	i = 0
-	for j in range(survivors):
-		new_generation[j]=mates[j]
-		i+=1
-	for j in range(i,species):
-		t = np.random.choice(len(mates), 2, replace=False)
-		new_generation[j]=np.where(np.random.choice([True,False], DNA_SIZE),mates[t[0]] , mates[t[1]])
-		new_generation[j]=mutate(new_generation[j],mutation)
-	return new_generation
-
-def mutate(dna,mutation):
-	return np.where(np.random.choice([True,False], DNA_SIZE, p=[1-mutation, mutation]), dna , 2*np.random.random(DNA_SIZE)-1)
+	return p
 
 counter = 0
 generation = 0
 element = 0
 
-## Initial DNA
-np.random.seed(SEED)
+## Set Params
 
+
+## Initial DNA
 dnas = 2*np.random.random((SPECIES,DNA_SIZE)) - 1 # zero mean
+leg = np.loadtxt('last_gen.txt', dtype=float)
+#dnas = leg
+#leg = dnas
 actual_best = np.zeros(DNA_SIZE)
+
 for generation in range(GENERATIONS):
+
 	scores = np.zeros(SPECIES)
+
 	for specie in range(SPECIES): 
+
+		## Initialize the Game itself
 		#Create game object
 		game = Game()
-
 		#Draw the game border
 		game.draw_border()
-
 		#Create my sprites
-		player = Player("triangle", "blue", 0, -280*(1-2*counter%2), 180-90*(1-2*counter%2))
-		enemy = Player("triangle", "red", 0, 280*(1-2*counter%2), 180+90*(1-2*counter%2))
-
-		#Keyboard bindings
-		turtle.onkey(enemy.turn_left, "Left")
-		turtle.onkey(enemy.turn_right, "Right")
-		turtle.onkey(enemy.accelerate, "Up")
-		turtle.onkey(enemy.decelerate, "Down")
-		turtle.listen()
+		player = Player("triangle", "blue", 0, -280, 90)
+		enemy = Player("triangle", "red", 0, 280, 270)
 
 		#Genetic properties 
-		dna = dnas[specie]
-		dna0 = np.reshape(dna[0:(L0*L1)], (L0,L1))
-		dna1 = np.reshape(dna[(L0*L1):(L0*L1)+(L1*L2)],(L1,L2))
-		dna2 = np.reshape(dna[(L0*L1)+(L1*L2):],(L2,L3))
-
+		leg = np.loadtxt('last_gen.txt', dtype=float)
+		dnas = leg
 		# #Use saved pilot
-		b = np.loadtxt('save.txt', dtype=float)
-		b0 = np.reshape(b[0:(L0*L1)], (L0,L1))
-		b1 = np.reshape(b[(L0*L1):(L0*L1)+(L1*L2)],(L1,L2))
-		b2 = np.reshape(b[(L0*L1)+(L1*L2):],(L2,L3))
+		p1 = ap.Autopilot(dnas[specie],[l[0],l[1],l[2],l[3]])
+		p2 = ap.Autopilot(leg[specie],[l[0],l[1],l[2],l[3]])
+
+		manual_control(enemy)
 
 		#Main game loop
 		while not game_over(player):
-			aulopilot(player,enemy,game,dna0,dna1,dna2)
-			aulopilot(enemy,player,game,b0,b1,b2) # using saved for enemy
+			# enemy.update_state(p1.fly_me(turtle))
+			player.update_state(p1.fly_ai(flight_params(player,enemy,game)))
+			# enemy.update_state(p2.fly_ai(flight_params(enemy,player,game))) # using saved for enemy
 			game.update_score(player,enemy)
 			player.move()
 			enemy.move()
 			# # To show playable animation
 			#game.show_status(player,enemy)
 			# To show quick animation
-			if counter%150==0:
+			if counter%15==0:
 				turtle.update()
 		scores[specie] = game.score
 		print("Final Score: " + str("%9.2f" % game.score) + " [GEN] "+ str(generation)+ " [#] "+ str(specie))
@@ -310,23 +247,13 @@ for generation in range(GENERATIONS):
 		enemy.reset()
 		counter += 1
 	# import code; code.interact(local=dict(globals(), **locals()))
-	selected = select(scores,SURVIVORS)
-	selected_dnas = np.zeros((SURVIVORS,DNA_SIZE))
-	for i, mate_number in enumerate(selected):
-		selected_dnas[i]=dnas[mate_number]
-	# Dynamic mutation
-	if np.amax(scores)<0:
-		dyn_mut = 0.75
-	elif np.amax(scores)<1:
-		dyn_mut = 0.5
-	else:
-		dyn_mut = 0.9/np.amax(scores)
+	selected_dnas = gen.select_dna(SURVIVORS,DNA_SIZE,dnas, scores)
+	dyn_mut = MUTATION #gen.dyn_mutation(MUTATION,scores)
 	actual_best = dnas[np.argmax(scores)]
-	dnas = breed(selected_dnas, SURVIVORS, SPECIES, dyn_mut)
-	print "Selected: " + str(selected)
-	# delay = raw_input("Press enter to go. > ")
+	dnas = gen.breed(selected_dnas, SURVIVORS, SPECIES, dyn_mut, DNA_SIZE)
 
 
-a = actual_best
-np.savetxt('save.txt', a, fmt='%f')
-print "Saved: " + str(actual_best)
+
+# a = actual_best
+# np.savetxt('save.txt', a, fmt='%f')
+# print "Saved: " + str(actual_best)
