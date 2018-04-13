@@ -245,7 +245,7 @@ for generation in range(GENERATIONS):
 			# # To show playable animation
 			#game.show_status(player,enemy)
 			# To show quick animation
-			if counter%90==0:
+			if counter%15==0:
 				turtle.update()
 		scores[specie] = game.score
 		print("Final Score: " + str("%9.2f" % game.score) + " [GEN] "+ str(generation)+ " [#] "+ str(specie))
