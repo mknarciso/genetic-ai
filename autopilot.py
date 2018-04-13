@@ -19,16 +19,16 @@ class Autopilot():
 		else:
 			start = 0
 			for i in range(pos-1):
-				start += self.layers[i]*self.layers[i+1]
-			end = start + self.layers[pos]*self.layers[pos+1]
-			return np.reshape(self.dna[start:end],(self.layers[pos],self.layers[pos+1]))
+				start += (1+self.layers[i])*self.layers[i+1]
+			end = start + (1+self.layers[pos])*self.layers[pos+1]
+			return np.reshape(self.dna[start:end],(self.layers[pos]+1,self.layers[pos+1]))
 
 	#Autopilot
 	def fly_ai(self, p):
 		act = np.zeros(2)
 		l1 = sig(np.dot(p,self.split_dna(0)))
-		l2 = sig(np.dot(l1,self.split_dna(1)))
-		l3 = sig(np.dot(l2,self.split_dna(2)))
+		l2 = sig(np.dot(np.concatenate((np.ones(1),l1),axis=0),self.split_dna(1)))
+		l3 = sig(np.dot(np.concatenate((np.ones(1),l2),axis=0),self.split_dna(2)))
 
 		if l3[0]>l3[1] and l3[0]>l3[2]:
 			act[0]=1

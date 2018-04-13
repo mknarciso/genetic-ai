@@ -14,18 +14,18 @@ import genetics as gen
 ## Constants
 
 # Model
-l = [14,10,5,3]
+l = [14,9,4,3]
 # l[0] = 14  # Inputs
 # l[1] = 10
 # l[2] = 5
 # l[3] = 3 	 # Outputs
-DNA_SIZE = (l[0]*l[1]+l[1]*l[2]+l[2]*l[3])
+DNA_SIZE = (l[0]*l[1]+(l[1]+1)*l[2]+(l[2]+1)*l[3])
 
 # Genetics
 GENERATIONS = 15
 SPECIES = 15
 SURVIVORS = 4
-MUTATION = 0.05
+MUTATION = 0.02
 SEED = 2
 # Tactical
 FUEL = 700
@@ -68,6 +68,12 @@ def distance_score(blue, red):
 		score = 50/d
 	return score
 
+def desertor_score(me):
+	dist = float(me.distance(0,0))
+	if dist > 280:
+		return -dist/280
+	return 0
+
 def aa_score(blue, red):
 	return abs(aspect_angle(red,blue))-abs(aspect_angle(blue,red))
 
@@ -77,8 +83,8 @@ def game_over(player):
 	return False
 
 def manual_control(who):
-		# turtle.onkey(enemy.update_state([1,0]), "Left")
-		# turtle.onkey(enemy.update_state([0,1]), "Right")
+	# turtle.onkey(enemy.update_state([1,0]), "Left")
+	# turtle.onkey(enemy.update_state([0,1]), "Right")
 	#Keyboard bindings
 	turtle.onkey(who.turn_left, "Left")
 	turtle.onkey(who.turn_right, "Right")
@@ -158,6 +164,7 @@ class Game():
 		# 	self.score += (100-radius)/600
 		if distance_score(blue,red) > 0.3:
 			self.score += (aa_score(blue,red)/180)*(distance_score(blue,red))
+		self.score += desertor_score(blue)
 		
 	def show_status(self, blue, red):
 		# self.pen.reset()
@@ -172,20 +179,20 @@ def flight_params(me, enemy, game):
 	# Ativacao
 	p[0] = 1
 	# Parametros
-	p[1] = float(me.distance(0,0)/300)#float(me.xcor())/300
-	p[2] = np.sin(me.towards(0,0)*np.pi/180)#float(me.ycor())/300
-	p[3] = np.cos(me.towards(0,0)*np.pi/180)#float(me.ycor())/300
-	p[4] = np.sin(me.heading()*np.pi/180)
-	p[5] = np.cos(me.heading()*np.pi/180)
-	p[6] = float(me.distance(enemy))/300
-	p[7] = np.sin(me.towards(enemy)*np.pi/180)
-	p[8] = np.cos(me.towards(enemy)*np.pi/180)
-	p[9] = float(aspect_angle(me, enemy))/180
-	p[10] = float(aspect_angle(enemy, me))/180
-	p[11] = float(distance_score(me, enemy))
-	p[12] = float(aa_score(me, enemy))/180
-	# p[12] = float(me.fuel)/2000
-	p[13] = float(game.score)/2000
+	p[1] = float(me.distance(0,0)/300) 			# Distance to objective
+	p[2] = np.sin(me.towards(0,0)*np.pi/180)	# sin of angle to objective
+	p[3] = np.cos(me.towards(0,0)*np.pi/180)	# cos of angle to objective
+	p[4] = np.sin(me.heading()*np.pi/180)		# sin of my heading
+	p[5] = np.cos(me.heading()*np.pi/180)		# cos of my heading
+	p[6] = float(me.distance(enemy))/300		# distance towards the enemy
+	p[7] = np.sin(me.towards(enemy)*np.pi/180)	# sin of heading to the enemy
+	p[8] = np.cos(me.towards(enemy)*np.pi/180)	# cos of heading to the enemy
+	p[9] = float(aspect_angle(me, enemy))/180	# aspect angle of the enemy
+	p[10] = float(aspect_angle(enemy, me))/180	# my aspect angle to the enemy
+	p[11] = float(distance_score(me, enemy))	# calculated distance score
+	p[12] = float(aa_score(me, enemy))/180		# calculated aspect angle score
+	p[12] = float(desertor_score(me))
+	#p[13] = float(game.score)/2000				# total game score
 	return p
 
 counter = 0
@@ -197,10 +204,11 @@ element = 0
 
 ## Initial DNA
 dnas = 2*np.random.random((SPECIES,DNA_SIZE)) - 1 # zero mean
-leg = np.loadtxt('last_gen.txt', dtype=float)
-#dnas = leg
+leg = np.loadtxt('save.txt', dtype=float)
+dnas = leg
 #leg = dnas
 actual_best = np.zeros(DNA_SIZE)
+#import code; code.interact(local=dict(globals(), **locals()))
 
 for generation in range(GENERATIONS):
 
@@ -214,12 +222,12 @@ for generation in range(GENERATIONS):
 		#Draw the game border
 		game.draw_border()
 		#Create my sprites
-		player = Player("triangle", "blue", 0, -280, 90)
-		enemy = Player("triangle", "red", 0, 280, 270)
+		player = Player("triangle", "blue", 50*(2*np.random.random(1) - 1)[0], -280, 90)
+		enemy = Player("triangle", "red", 50*(2*np.random.random(1) - 1)[0], 280, 270)
 
 		#Genetic properties 
-		leg = np.loadtxt('last_gen.txt', dtype=float)
-		dnas = leg
+		#leg = np.loadtxt('last_gen.txt', dtype=float)
+		#dnas = leg
 		# #Use saved pilot
 		p1 = ap.Autopilot(dnas[specie],[l[0],l[1],l[2],l[3]])
 		p2 = ap.Autopilot(leg[specie],[l[0],l[1],l[2],l[3]])
@@ -230,14 +238,14 @@ for generation in range(GENERATIONS):
 		while not game_over(player):
 			# enemy.update_state(p1.fly_me(turtle))
 			player.update_state(p1.fly_ai(flight_params(player,enemy,game)))
-			# enemy.update_state(p2.fly_ai(flight_params(enemy,player,game))) # using saved for enemy
+			enemy.update_state(p2.fly_ai(flight_params(enemy,player,game))) # using saved for enemy
 			game.update_score(player,enemy)
 			player.move()
 			enemy.move()
 			# # To show playable animation
 			#game.show_status(player,enemy)
 			# To show quick animation
-			if counter%15==0:
+			if counter%90==0:
 				turtle.update()
 		scores[specie] = game.score
 		print("Final Score: " + str("%9.2f" % game.score) + " [GEN] "+ str(generation)+ " [#] "+ str(specie))
@@ -246,7 +254,7 @@ for generation in range(GENERATIONS):
 		player.reset()
 		enemy.reset()
 		counter += 1
-	# import code; code.interact(local=dict(globals(), **locals()))
+	#import code; code.interact(local=dict(globals(), **locals()))
 	selected_dnas = gen.select_dna(SURVIVORS,DNA_SIZE,dnas, scores)
 	dyn_mut = MUTATION #gen.dyn_mutation(MUTATION,scores)
 	actual_best = dnas[np.argmax(scores)]
@@ -254,6 +262,6 @@ for generation in range(GENERATIONS):
 
 
 
-# a = actual_best
-# np.savetxt('save.txt', a, fmt='%f')
-# print "Saved: " + str(actual_best)
+a = dnas
+np.savetxt('save.txt', a, fmt='%f')
+print "Saved: " + str(dnas)
