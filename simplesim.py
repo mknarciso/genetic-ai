@@ -205,8 +205,8 @@ element = 0
 ## Initial DNA
 dnas = 2*np.random.random((SPECIES,DNA_SIZE)) - 1 # zero mean
 leg = np.loadtxt('save.txt', dtype=float)
-dnas = leg
-#leg = dnas
+#dnas = leg
+leg = dnas
 actual_best = np.zeros(DNA_SIZE)
 #import code; code.interact(local=dict(globals(), **locals()))
 
@@ -238,7 +238,7 @@ for generation in range(GENERATIONS):
 		while not game_over(player):
 			# enemy.update_state(p1.fly_me(turtle))
 			player.update_state(p1.fly_ai(flight_params(player,enemy,game)))
-			enemy.update_state(p2.fly_ai(flight_params(enemy,player,game))) # using saved for enemy
+			#enemy.update_state(p2.fly_ai(flight_params(enemy,player,game))) # using saved for enemy
 			game.update_score(player,enemy)
 			player.move()
 			enemy.move()

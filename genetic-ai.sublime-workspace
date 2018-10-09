@@ -1,0 +1,594 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"sel",
+				"selected_dnas"
+			],
+			[
+				"dna",
+				"dna_size"
+			],
+			[
+				"DNA",
+				"DNA_SIZE"
+			],
+			[
+				"act",
+				"act_pos"
+			],
+			[
+				"pro",
+				"process_state"
+			],
+			[
+				"dis",
+				"distance"
+			],
+			[
+				"am",
+				"amax"
+			],
+			[
+				"su",
+				"survivors"
+			],
+			[
+				"game",
+				"game_over"
+			],
+			[
+				"to",
+				"towards"
+			],
+			[
+				"sh",
+				"show_status"
+			],
+			[
+				"tra",
+				"trade_types"
+			],
+			[
+				"as",
+				"ask_prices"
+			],
+			[
+				"bid",
+				"bid_amounts"
+			],
+			[
+				"c",
+				"conflicts"
+			],
+			[
+				"pr",
+				"pretty_print"
+			],
+			[
+				"mater",
+				"materia2"
+			],
+			[
+				"i",
+				"i"
+			],
+			[
+				"al",
+				"alltopics_string"
+			],
+			[
+				"de",
+				"delta_us"
+			],
+			[
+				"start",
+				"start_t"
+			],
+			[
+				"mutex_C",
+				"mutex_ConsID"
+			],
+			[
+				"FOR",
+				"FOR"
+			],
+			[
+				"CHAR",
+				"CHARCT"
+			],
+			[
+				"TR",
+				"TRUE"
+			],
+			[
+				"REPE",
+				"REPEAT"
+			],
+			[
+				"PRO",
+				"PROGRAM"
+			],
+			[
+				"INT",
+				"INT"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"pac",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 153.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/mkn/Google Drive/TG/genetic-ai/autopilot.py",
+		"/Users/mkn/Google Drive/TG/genetic-ai/genetics.py",
+		"/Users/mkn/Google Drive/TG/genetic-ai/nn.py",
+		"/Users/mkn/Google Drive/TG/genetic-ai/playagainst.py",
+		"/Users/mkn/Google Drive/TG/genetic-ai/simplesim.py",
+		"/Users/mkn/Desktop/closed_reviews.json",
+		"/Users/mkn/Google Drive/TG/Python/AP.py",
+		"/Users/mkn/Downloads/Youtube_Analysis.ipynb",
+		"/Users/mkn/Google Drive/Estágio/IEAV/203103XX.F1C/203103XX.F1C/ACDAT044.xml",
+		"/Users/mkn/Google Drive/8o Semestre/CES-27/distributed-tensorflow/distributed_tensorflow.py",
+		"/Users/mkn/Google Drive/8o Semestre/CES-27/distributed-tensorflow/example.py",
+		"/Users/mkn/Google Drive/8o Semestre/CTC-17/Exame/sert_all.txt",
+		"/Users/mkn/Documents/Carteiras/carteiras.txt",
+		"/Users/mkn/Google Drive/8o Semestre/CES-65/stampstr/fornecedores/kafkaConsumerAndRecognizer.py",
+		"/Users/mkn/Desktop/robotCommands.py",
+		"/Users/mkn/Google Drive/8o Semestre/CES-65/stampstr/fornecedores/robot/SHDX.py",
+		"/Users/mkn/Desktop/secret.csv",
+		"/Users/mkn/Google Drive/quero_gentileza.txt",
+		"/Users/mkn/Google Drive/COMP-18/2º Ano Profissional - 2º Período/CES-30 (Técnicas de Bancos de Dados)/CES30 2017/Soluções A3/7704/lab3_murilo.sql",
+		"/Users/mkn/Downloads/ml-1m/README",
+		"/Users/mkn/Google Drive/8o Semestre/CTC-17/Lab2/n-queen-hill.py",
+		"/Users/mkn/Downloads/robotControl.py",
+		"/Users/mkn/Google Drive/8o Semestre/CES-30/Lab1/exportar.sql",
+		"/Users/mkn/Google Drive/8o Semestre/CES-30/Lab1/dml.sql",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab5/lab5.y",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab5/lab5.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Serie2/teste.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Serie2/ex3.y",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Serie2/ex3.l",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/ita-ct236-projeto/topicos.csv",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/ita-ct236-projeto/save_to_json.py",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/ita-ct236-projeto/req3.csv",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/ita-ct236-projeto/gera_grafos2.py",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/ita-ct236-projeto/requisitos-direct.csv",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/ita-ct236-projeto/requisitos_atual.csv",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/ita-ct236-projeto/autores.csv",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/ita-ct236-projeto/Requisitos.py",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/ita-ct236-projeto/nohs.csv",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/ita-ct236-projeto/gera_grafos.py",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/Exame/requisitos.csv",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/Exame/nohs.csv",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/Exame/proc_ita_catalog.py",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab5/lex.yy.c",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/Exame/separado.json",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/Exame/save_to_json.py",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/Exame/exemplo_json.txt",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/Exame/materias_sem_acento.txt",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/Exame/separado.txt",
+		"/Users/mkn/Google Drive/7o Semestre/CES-29/P2/ita-ces29-p2-q2/read_big.txt",
+		"/Users/mkn/Google Drive/7o Semestre/CES-29/P2/ita-ces29-p2-q2/write.txt",
+		"/Users/mkn/Google Drive/7o Semestre/CES-29/P2/ita-ces29-p2-q4b/README.md",
+		"/Users/mkn/Google Drive/7o Semestre/CES-29/P2/ita-ces29-p2-q4/src/exec/VulnerableClass.java",
+		"/Users/mkn/Google Drive/7o Semestre/CES-29/P2/ita-ces29-p2-q1/TEXTO.md",
+		"/Users/mkn/Google Drive/7o Semestre/CES-29/P2/ita-ces29-p2-q2/read.txt",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab4/lab4.sh",
+		"/Users/mkn/Desktop/Murilo/Shared Ubuntu/stamps.txt",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab4/lab3.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab4/lab3.y",
+		"/Users/mkn/Google Drive/7o Semestre/CES-25/-MIPS-CES25.2017/test_without_comments.txt",
+		"/Users/mkn/Google Drive/7o Semestre/CT-236/Atividade8/laplacianas.txt",
+		"/Users/mkn/Desktop/Murilo/Shared Ubuntu/count_no_io.c",
+		"/Users/mkn/Desktop/Murilo/Shared Ubuntu/count_with_io.c",
+		"/Users/mkn/Desktop/Murilo/Shared Ubuntu/testeeeeeeeeee.txt",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab4/tsimb022017.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab4/tsimb022017.y",
+		"/Users/mkn/Desktop/Murilo/Shared Ubuntu/testewindows.txt",
+		"/Users/mkn/Desktop/chmc.sh",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab3/lab3.sh",
+		"/Users/mkn/Google Drive/7o Semestre/CES-33/Lab3/Lab3-APL-Graph_sleep_wakeup.c",
+		"/Users/mkn/Google Drive/7o Semestre/CES-33/Lab3/Lab3-APL-Graph_final.c",
+		"/Users/mkn/Google Drive/7o Semestre/CES-33/Lab3/Lab3-APL-Graph.c",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab3/lab3.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab3/example.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab3/y.output",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab3/lab3.y",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab2/lab2__.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab3/pretty.y",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab3/pretty.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab3/gramatica.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab2/recfrase.y",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab2/ppp",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab2/recfrase.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/ex6.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/coment.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab2/lab2.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/coment.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/ex6.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab2/lab2.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab2/y.tab.c",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab2/main.c",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/ex4.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/ex5.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/ex3.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/ex2.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/ex5.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/ex1.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/atributos.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/automato.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/entra.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES-41/Lab1/ex1.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES41/Lab1/atributos.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES41/Lab1/lex.yy.c",
+		"/Users/mkn/Google Drive/7o Semestre/CES41/Lab1/while.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES41/Lab1/while.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES41/Lab1/automato.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES41/Lab1/automato.dat",
+		"/Users/mkn/Google Drive/7o Semestre/CES41/Lab1/atributos.l",
+		"/Users/mkn/Google Drive/7o Semestre/CES41/Lab1/RealChatString.l"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"=>",
+			"L3",
+			"L2",
+			"L1",
+			"L0",
+			"L3",
+			"L2",
+			"L1",
+			"L0",
+			"is_desertor",
+			"dna_size",
+			"L2",
+			"SURVIVALS",
+			"[",
+			"]",
+			"][",
+			"#",
+			"][",
+			"message.value",
+			"\"",
+			"os",
+			"cap",
+			"cv2",
+			"cap",
+			"subprocess",
+			",",
+			"\"",
+			"17",
+			"16",
+			"( id, mes, anO, mes_n, ano_n )",
+			"tempo ( id, mes, ano, mes_n, ano_n )",
+			"tempo ( id, mes, anO )",
+			"(",
+			"INSERT INTO tempo ( mes, ano ) VALUES",
+			",",
+			"16",
+			"\n	* ",
+			"state",
+			"=>.*",
+			"\\n",
+			":.*\\n",
+			"nil, ",
+			"nil, \"",
+			"\", \"",
+			"ExprList",
+			"CallStat",
+			"\\}",
+			"\\{",
+			"{",
+			"Concat",
+			"CTC-20",
+			"CES-20",
+			"MPG-02",
+			"MEB-12",
+			"MAT-41",
+			"EST-22",
+			"AED-22",
+			"AED-02",
+			"AED-01",
+			"PRP-20",
+			"PRP",
+			"PRP-20",
+			"FIS-45",
+			"undirected;",
+			"FIS-45",
+			"mat",
+			"ABBAGNANO",
+			".*[bB]ibliografia[ *]:(.*)",
+			"[A-Z]+ *, *[[A-Z]\\. *]+",
+			"[A-Z]+ *, *{[A-Z]\\. *}+",
+			"[^A-Z, \\-()0-9/\\.\\n:;'\"?&\\[\\]\\+]",
+			"®",
+			"[^A-Z, \\-()0-9/\\.\\n:;'\"?&\\[\\]\\+]",
+			"º",
+			"[^A-Z, \\-()0-9/\\.\\n:;'\"?&\\[\\]\\+]",
+			"´",
+			"[^A-Z, \\-()0-9/\\.\\n:;'\"?&]",
+			"[^A-Z, \\-()0-9/\\.\\n:;'?&]",
+			"ª",
+			"“|”",
+			"[^A-Z, \\-()0-9/\\.\\n:;']",
+			"’",
+			"[^A-Z, \\-()0-9/\\.\\n:;]",
+			"[hH]oras [sS]emanais: *([0-9]+) *- *([0-9]+) *- *([0-9]+) *- *([0-9]+)[^\\.]",
+			"Bibliografi[^a]",
+			"MTP-48",
+			"MTM-31",
+			"ELE-32",
+			"EES-25",
+			"EEA-05",
+			"AER-20",
+			"PRP-40",
+			"HUM-74",
+			"HUM-43",
+			"Horas semanais: *([0-9]+) *- *([0-9]+) *- *([0-9]+) *- *([0-9]+)",
+			"Horas semanais:.*([0-9] *- *[0-9] *- *[0-9] *- *[0-9])",
+			"Horas semanais:[0-9]",
+			"Horas semanais ",
+			"recomen",
+			"MVO-65",
+			"Ñ",
+			"ñ",
+			"[úùüû]",
+			"[ÚÙÜÛ]",
+			"[ÓÒÖÔÕ]",
+			"[óòöôõ]",
+			"[ÍÌÏÎ]",
+			"[íìïî]",
+			"Ç",
+			"ç",
+			"[ÉÈËÊ]",
+			"[éèëê]",
+			"[ÁÀÄÃÂ]",
+			"[áàäâã]",
+			"Â",
+			"À",
+			"Á",
+			"([A-Z]{3}\\-[0-9]{2})[ -]*([A-ZÁÀÂÃÉÊËÈÍÏÎÓÔÕÖÜÚÇÑ ]*)",
+			" *\\f *",
+			"\\s*\\f\\s*",
+			"([A-Z]{3}-[0-9]{2})  :",
+			"([A-Z]{3}-[0-9]{2}) :",
+			"([A-Z]{3}-[0-9]{2}):",
+			"([A-Z]{3}-[0-9]{2}) :  ([A-Z]{3,})",
+			"([A-Z]{3}-[0-9]{2}) : ([A-Z]{3,})",
+			"([A-Z]{3}-[0-9]{2}) :([A-Z]{3,})",
+			"([A-Z]{3}-[0-9]{2}):([A-Z]{3,})",
+			"([A-Z]{3}-[0-9]{2}): ([A-Z]{3,})"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"l[3]",
+			"l[2]",
+			"l[1]",
+			"l[0]",
+			"l[3]",
+			"l[2]",
+			"l[1]",
+			"l[0]",
+			"DNA_SIZE",
+			"L3",
+			", ",
+			"\n#\n",
+			"\n#",
+			", ",
+			"command",
+			"",
+			"\n",
+			"'",
+			"2017",
+			"2016",
+			"( id, mes, ano, mes_n)",
+			"2016",
+			"( id, mes, ano, mes_n)",
+			"tempo ( id, mes, ano, mes_n, ano_n )",
+			"( 0116 ,",
+			"INSERT INTO tempo ( id, mes, ano ) VALUES",
+			";\nINSERT INTO tempo ( id, mes, ano ) VALUES",
+			";\nINSERT INTO tempo ( mes, ano ) VALUES",
+			"17",
+			"\", \"",
+			"s",
+			"",
+			"\nans[:",
+			"]\n",
+			"nil,\n]",
+			"nil,\n",
+			"\"\nnil\n",
+			"\"\n\"",
+			"\\n\\}",
+			"\\{\\n",
+			"{\\n",
+			"CTC-21",
+			"CES-22",
+			"MPG-03",
+			"MEB-13",
+			"MAT-42",
+			"EST-24",
+			"AED-11",
+			"AED-01",
+			"PRP-40",
+			"FIS-46",
+			"",
+			"FIS-46",
+			"materia",
+			"",
+			"o",
+			"'",
+			"a",
+			"\"",
+			"'",
+			"u",
+			"U",
+			"O",
+			"o",
+			"I",
+			"i",
+			"C",
+			"c",
+			"E",
+			"e",
+			"A",
+			"a",
+			" ",
+			"",
+			" ",
+			"\\n\\n$1 - $2",
+			" ",
+			"-",
+			"\\n\\n$1",
+			" ",
+			"\\n\\n$1",
+			"\\n$1",
+			"$1",
+			"\\n$1",
+			" ",
+			"\\n",
+			"\\\\n",
+			"\\n",
+			"",
+			" ",
+			"return ",
+			" ",
+			"return ",
+			"%token",
+			"ADD",
+			"string",
+			"CLPAR",
+			"OPPAR",
+			"MULT",
+			"SUB",
+			"ADD",
+			"MULTOP",
+			"ADOP",
+			"RELOP",
+			"|"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": false
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"s",
+				"/Users/mkn/Google Drive/TG/Python/simplesim.py"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true
+}
