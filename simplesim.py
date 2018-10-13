@@ -204,7 +204,7 @@ element = 0
 
 ## Initial DNA
 dnas = 2*np.random.random((SPECIES,DNA_SIZE)) - 1 # zero mean
-leg = np.loadtxt('save.txt', dtype=float)
+#leg = np.loadtxt('save.txt', dtype=float)
 #dnas = leg
 leg = dnas
 actual_best = np.zeros(DNA_SIZE)
