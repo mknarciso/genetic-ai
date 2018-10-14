@@ -37,7 +37,7 @@ def mutate(dna,mutation,dna_size):
 
 def select_dna(survivors,dna_size,dnas, scores):
 	selected = select(scores,survivors)	
-	print "Selected: " + str(selected)
+	print("Selected: " + str(selected))
 	selected_dnas = np.zeros((survivors,dna_size))
 	for i, mate_number in enumerate(selected):
 		selected_dnas[i]=dnas[mate_number]

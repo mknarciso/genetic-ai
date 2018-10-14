@@ -30,6 +30,8 @@ class DeepQNetwork:
             batch_size=32,
             e_greedy_increment=None,
             output_graph=False,
+            training=False,
+            import_file=None
     ):
         self.n_actions = n_actions
         self.n_features = n_features
@@ -41,6 +43,7 @@ class DeepQNetwork:
         self.batch_size = batch_size
         self.epsilon_increment = e_greedy_increment
         self.epsilon = 0 if e_greedy_increment is not None else self.epsilon_max
+        self.training = training
 
         # total learning step
         self.learn_step_counter = 0
@@ -57,6 +60,9 @@ class DeepQNetwork:
         with tf.variable_scope('soft_replacement'):
             self.target_replace_op = [tf.assign(t, e) for t, e in zip(t_params, e_params)]
 
+        
+        self.saver = tf.train.Saver()   
+
         self.sess = tf.Session()
 
         if output_graph:
@@ -66,6 +72,9 @@ class DeepQNetwork:
         self.sess.run(tf.global_variables_initializer())
         self.cost_his = []
 
+        if import_file is not None:
+            self.saver.restore(self.sess, import_file)
+
     def _build_net(self):
         # ------------------ all inputs ------------------------
         self.s = tf.placeholder(tf.float32, [None, self.n_features], name='s')  # input State
@@ -74,19 +83,28 @@ class DeepQNetwork:
         self.a = tf.placeholder(tf.int32, [None, ], name='a')  # input Action
 
         w_initializer, b_initializer = tf.random_normal_initializer(0., 0.3), tf.constant_initializer(0.1)
-
+ 
         # ------------------ build evaluate_net ------------------
         with tf.variable_scope('eval_net'):
-            e1 = tf.layers.dense(self.s, 32, tf.nn.relu, kernel_initializer=w_initializer,
+
+            e1 = tf.layers.dense(self.s, 20, tf.nn.sigmoid, kernel_initializer=w_initializer,
                                  bias_initializer=b_initializer, name='e1')
-            self.q_eval = tf.layers.dense(e1, self.n_actions, kernel_initializer=w_initializer,
+            ee1 = tf.layers.dense(e1, 20, tf.nn.sigmoid, kernel_initializer=w_initializer,
+                                 bias_initializer=b_initializer, name='ee1')
+            eee1 = tf.layers.dense(ee1, 10, tf.nn.relu, kernel_initializer=w_initializer,
+                                 bias_initializer=b_initializer, name='eee1')
+            self.q_eval = tf.layers.dense(eee1, self.n_actions, kernel_initializer=w_initializer,
                                           bias_initializer=b_initializer, name='q')
 
         # ------------------ build target_net ------------------
         with tf.variable_scope('target_net'):
-            t1 = tf.layers.dense(self.s_, 32, tf.nn.relu, kernel_initializer=w_initializer,
+            t1 = tf.layers.dense(self.s_, 20, tf.nn.sigmoid, kernel_initializer=w_initializer,
                                  bias_initializer=b_initializer, name='t1')
-            self.q_next = tf.layers.dense(t1, self.n_actions, kernel_initializer=w_initializer,
+            tt1 = tf.layers.dense(t1, 20, tf.nn.sigmoid, kernel_initializer=w_initializer,
+                                 bias_initializer=b_initializer, name='tt1')
+            ttt1 = tf.layers.dense(tt1, 10, tf.nn.relu, kernel_initializer=w_initializer,
+                                 bias_initializer=b_initializer, name='ttt1')
+            self.q_next = tf.layers.dense(ttt1, self.n_actions, kernel_initializer=w_initializer,
                                           bias_initializer=b_initializer, name='t2')
 
         with tf.variable_scope('q_target'):
@@ -148,6 +166,10 @@ class DeepQNetwork:
         # increasing epsilon
         self.epsilon = self.epsilon + self.epsilon_increment if self.epsilon < self.epsilon_max else self.epsilon_max
         self.learn_step_counter += 1
+
+        # save model
+        if self.training:
+            self.saver.save(self.sess, 'saved/trained_dqn')
 
     def plot_cost(self):
         import matplotlib.pyplot as plt

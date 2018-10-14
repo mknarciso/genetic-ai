@@ -48,8 +48,8 @@ class Dogfight(object):
 
 	def _build_game(self):
 		#Create my sprites
-		self.player = self.Player("triangle", "blue", 50*(2*np.random.random(1) - 1)[0], -280, 90)
-		self.enemy = self.Player("triangle", "red", 50*(2*np.random.random(1) - 1)[0], 280, 270)
+		self.player = self.Player("triangle", "blue", 50*(2*np.random.random(1) - 1)[0], -250, 90)
+		self.enemy = self.Player("triangle", "red", 50*(2*np.random.random(1) - 1)[0], 250, 270)
 
 	def reset(self):
 		turtle.clear()
@@ -163,14 +163,22 @@ class Dogfight(object):
 			self.score = 0
 
 		def step_score(self, blue, red):
+
 			ans = 0 
-			if desertor_score(blue) < 0:
-				ans = -1
-			elif distance_score(blue,red) > 0.3:
-				if aa_score(blue,red) > 0:
-					ans = 1
-				else:
-					ans = -1
+			# target score
+			radius = blue.distance(0,0)
+			# if radius<100:
+			# 	self.score += (100-radius)/600
+			if distance_score(blue,red) > 0.3:
+				ans += (aa_score(blue,red)/180)*(distance_score(blue,red))
+			ans += desertor_score(blue)
+			# if desertor_score(blue) < 0:
+			# 	ans = desertor_score(blue)
+			# elif distance_score(blue,red) > 0.3:
+			# 	if aa_score(blue,red) > 0.1:
+			# 		ans = aa_score(blue,red)
+			# 	elif aa_score(blue,red) < -0.1:
+			# 		ans = aa_score(blue,red)
 			return ans
 
 		def update_score(self, blue, red):
@@ -184,6 +192,14 @@ class Dogfight(object):
 			self.pen.goto(-290,-290)
 			self.pen.write(msg, font=("Courier", 16, "normal"))
 
+# def show_status(self, blue, red):
+# 	# self.pen.reset()
+# 	self.pen.undo()
+# 	msg = "[Blue]%+7.2f | %.3f \n[ Red]%+7.2f \n[Advg]%+7.2f | %.3f \n[Scor]%+7.2f" % (aspect_angle(blue,red), distance_score(blue,red), aspect_angle(red,blue), aa_score(blue,red), aa_score(blue,red)/180, self.score )
+# 	self.pen.penup()
+# 	self.pen.goto(-290,-290)
+# 	self.pen.write(msg, font=("Courier", 16, "normal"))
+
 def aspect_angle(from_t, to_t):
 	aa = float(to_t.heading() - from_t.towards(to_t))
 	if aa < -180:
@@ -196,18 +212,18 @@ def distance_score(blue, red):
 	d = blue.distance(red)
 	score = 0
 	if d<50:
-		return 1
-		# score = d/50
+		# return 1
+		score = d/50
 	else:
-		return 0
-	# 	score = 50/d
-	# return score
+		# return 0
+		score = 50/d
+	return score
 
 def desertor_score(me):
 	dist = float(me.distance(0,0))
 	if dist > 280:
-		# return -dist/280
-		return -1
+		return -(dist-280)/280
+		# return -1
 	return 0
 
 def aa_score(blue, red):

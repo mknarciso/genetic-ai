@@ -264,4 +264,4 @@ for generation in range(GENERATIONS):
 
 a = dnas
 np.savetxt('save.txt', a, fmt='%f')
-print "Saved: " + str(dnas)
+print("Saved: " + str(dnas))

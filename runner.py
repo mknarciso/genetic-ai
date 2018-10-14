@@ -7,6 +7,9 @@ import genetics as gen
 
 from dogfight_env import Dogfight
 
+
+import matplotlib.pyplot as plt
+
 ## Constants
 
 # Model
@@ -32,13 +35,15 @@ element = 0
 
 ## Initial DNA
 dnas = 2*np.random.random((SPECIES,DNA_SIZE)) - 1 # zero mean
-leg = np.loadtxt('save.txt', dtype=float)
-dnas = leg
-# leg = dnas
+# leg = np.loadtxt('save.txt', dtype=float)
+# dnas = leg
+leg = dnas
 actual_best = np.zeros(DNA_SIZE)
 #import code; code.interact(local=dict(globals(), **locals()))
 
 env = Dogfight()
+
+gen_score = []
 
 for generation in range(GENERATIONS):
 
@@ -69,19 +74,24 @@ for generation in range(GENERATIONS):
 			if done:
 				break
 
-		scores[specie] = blue_reward
-		print("Final Score: " + str("%9.2f" % blue_reward) + " [GEN] "+ str(generation)+ " [#] "+ str(specie))
+			scores[specie] += blue_reward
+		print("Final Score: " + str("%9.2f" % scores[specie]) + " [GEN] "+ str(generation)+ " [#] "+ str(specie))
 		
 		env.reset()
 		counter += 1
+	gen_score.append(sum(scores)/len(scores))
+
 	#import code; code.interact(local=dict(globals(), **locals()))
 	selected_dnas = gen.select_dna(SURVIVORS,DNA_SIZE,dnas, scores)
 	dyn_mut = MUTATION #gen.dyn_mutation(MUTATION,scores)
 	actual_best = dnas[np.argmax(scores)]
 	dnas = gen.breed(selected_dnas, SURVIVORS, SPECIES, dyn_mut, DNA_SIZE)
 
-
+plt.plot(np.arange(len(gen_score)), gen_score)
+plt.ylabel('Avg Score')
+plt.xlabel('Generation')
+plt.show()
 
 a = dnas
 np.savetxt('save.txt', a, fmt='%f')
-print "Saved: " + str(dnas)
+print("Saved: " + str(dnas))
