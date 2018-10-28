@@ -22,10 +22,10 @@ class DeepQNetwork:
             self,
             n_actions,
             n_features,
-            learning_rate=0.01,
+            learning_rate=0.001,
             reward_decay=0.9,
             e_greedy=0.9,
-            replace_target_iter=300,
+            replace_target_iter=50,
             memory_size=500,
             batch_size=32,
             e_greedy_increment=None,
@@ -84,29 +84,25 @@ class DeepQNetwork:
         self.r = tf.placeholder(tf.float32, [None, ], name='r')  # input Reward
         self.a = tf.placeholder(tf.int32, [None, ], name='a')  # input Action
 
-        w_initializer, b_initializer = tf.random_normal_initializer(0., 0.4), tf.constant_initializer(0.1)
+        w_initializer, b_initializer = tf.random_normal_initializer(0., 0.3), tf.constant_initializer(0.1)
  
         # ------------------ build evaluate_net ------------------
         with tf.variable_scope('eval_net'):
 
-            e1 = tf.layers.dense(self.s, 30, tf.nn.tanh, kernel_initializer=w_initializer,
+            e1 = tf.layers.dense(self.s, 30, tf.nn.relu, kernel_initializer=w_initializer,
                                  bias_initializer=b_initializer, name='e1')
-            ee1 = tf.layers.dense(e1, 30, tf.nn.sigmoid, kernel_initializer=w_initializer,
-                                 bias_initializer=b_initializer, name='ee1')
-            eee1 = tf.layers.dense(ee1, 10, tf.nn.relu, kernel_initializer=w_initializer,
-                                 bias_initializer=b_initializer, name='eee1')
-            self.q_eval = tf.layers.dense(eee1, self.n_actions, kernel_initializer=w_initializer,
+            #eee1 = tf.layers.dense(e1, 10, tf.nn.tanh, kernel_initializer=w_initializer,
+            #                     bias_initializer=b_initializer, name='eee1')
+            self.q_eval = tf.layers.dense(e1, self.n_actions, kernel_initializer=w_initializer,
                                           bias_initializer=b_initializer, name='q')
 
         # ------------------ build target_net ------------------
         with tf.variable_scope('target_net'):
-            t1 = tf.layers.dense(self.s_, 30, tf.nn.tanh, kernel_initializer=w_initializer,
+            t1 = tf.layers.dense(self.s_, 30, tf.nn.relu, kernel_initializer=w_initializer,
                                  bias_initializer=b_initializer, name='t1')
-            tt1 = tf.layers.dense(t1, 30, tf.nn.sigmoid, kernel_initializer=w_initializer,
-                                 bias_initializer=b_initializer, name='tt1')
-            ttt1 = tf.layers.dense(tt1, 10, tf.nn.relu, kernel_initializer=w_initializer,
-                                 bias_initializer=b_initializer, name='ttt1')
-            self.q_next = tf.layers.dense(ttt1, self.n_actions, kernel_initializer=w_initializer,
+            #ttt1 = tf.layers.dense(t1, 10, tf.nn.tanh, kernel_initializer=w_initializer,
+            #                     bias_initializer=b_initializer, name='ttt1')
+            self.q_next = tf.layers.dense(t1, self.n_actions, kernel_initializer=w_initializer,
                                           bias_initializer=b_initializer, name='t2')
 
         with tf.variable_scope('q_target'):
@@ -118,7 +114,7 @@ class DeepQNetwork:
         with tf.variable_scope('loss'):
             self.loss = tf.reduce_mean(tf.squared_difference(self.q_target, self.q_eval_wrt_a, name='TD_error'))
         with tf.variable_scope('train'):
-            self._train_op = tf.train.RMSPropOptimizer(self.lr).minimize(self.loss)
+            self._train_op = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
 
     def store_transition(self, s, a, r, s_):
         if not hasattr(self, 'memory_counter'):
