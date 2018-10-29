@@ -8,9 +8,9 @@ from DQN_modified5 import DeepQNetwork
 
 import matplotlib.pyplot as plt
 path = "C:/bvr_ai/"
-env = Aerograf(path)
+env = Aerograf(path,14)
 RL = DeepQNetwork(n_actions=6, 
-				  n_features=13,
+				  n_features=14,
                   learning_rate=0.001,
                   reward_decay=0.9,
                   e_greedy=0.97,

@@ -125,6 +125,7 @@ class DeepQNetwork:
         self.memory[index, :] = transition
         self.memory_counter += 1
 
+
     def choose_action(self, observation):
         # to have batch dimension when feed into tf placeholder
         observation = observation[np.newaxis, :]
@@ -142,6 +143,11 @@ class DeepQNetwork:
         if self.learn_step_counter % self.replace_target_iter == 0:
             self.sess.run(self.target_replace_op)
             print('\ntarget_params_replaced\n')
+            #a = np.array([1, 2, 3, 4])
+            #np.savetxt('test1.txt', a, fmt='%d')
+            #b = np.loadtxt('test1.txt', dtype=int)
+            self.memory.tofile('C:/bvr_ai/memory/dqn5.dat')
+            #c = np.fromfile('test2.dat', dtype=int)
 
         # sample batch memory from all memory
         if self.memory_counter > self.memory_size:
