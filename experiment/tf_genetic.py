@@ -22,7 +22,7 @@ class DeepQNetwork:
             self,
             n_actions,
             n_features,
-            learning_rate=0.01,
+            learning_rate=0.001,
             reward_decay=0.9,
             e_greedy=0.95,
             replace_target_iter=50,
@@ -58,7 +58,8 @@ class DeepQNetwork:
             self.memory_counter = 0
         else:
             self.memory = np.zeros((self.memory_size, each_batch_size))
-            pre_memory = np.fromfile('C:/bvr_ai/memory/dqn5.dat', dtype=float)
+            pre_memory = np.fromfile(mem_file, dtype=float)
+            #import code; code.interact(local=dict(globals(), **locals()))
             pre_memory = pre_memory.reshape(int(pre_memory.shape[0]/each_batch_size), each_batch_size)
             
             zlines = pre_memory[np.all(pre_memory == 0, axis=1)].shape[0]
@@ -109,13 +110,10 @@ class DeepQNetwork:
         # ------------------ build evaluate_net ------------------
         with tf.variable_scope('eval_net'):
 
-            e1 = tf.layers.dense(self.s, 20, tf.nn.tanh, kernel_initializer=w_initializer,
-                                 bias_initializer=b_initializer, name='e1')
+            e1 = tf.layers.dense(s, 20, tf.nn.tanh, kernel_initializer=w_initializer, bias_initializer=b_initializer, name='e1')
             #eee1 = tf.layers.dense(e1, 10, tf.nn.relu, kernel_initializer=w_initializer,
             #                     bias_initializer=b_initializer, name='eee1')
-            self.q_eval = tf.layers.dense(e1, self.n_actions, tf.nn.softmax, kernel_initializer=w_initializer,
-                                          bias_initializer=b_initializer, name='q')
-
+            q_eval = tf.layers.dense(e1, n_actions, tf.nn.softmax, kernel_initializer=w_initializer, bias_initializer=b_initializer, name='q')
         # ------------------ build target_net ------------------
         with tf.variable_scope('target_net'):
             t1 = tf.layers.dense(self.s_, 20, tf.nn.tanh, kernel_initializer=w_initializer,
@@ -136,7 +134,7 @@ class DeepQNetwork:
         with tf.variable_scope('loss'):
             self.loss = tf.reduce_mean(tf.squared_difference(self.q_target, self.q_eval_wrt_a, name='TD_error'))
         with tf.variable_scope('train'):
-            self._train_op = tf.train.RMSPropOptimizer(self.lr).minimize(self.loss)
+            self._train_op = tf.train.AdamOptimizer(learning_rate=self.lr).minimize(self.loss)
 
     def store_transition(self, s, a, r, s_):
         #if not hasattr(self, 'memory_counter'):

@@ -9,6 +9,8 @@ Using:
 Tensorflow: r1.2
 """
 
+# Smaller hidden layer
+
 import numpy as np
 import tensorflow as tf
 
@@ -22,7 +24,7 @@ class DeepQNetwork:
             self,
             n_actions,
             n_features,
-            learning_rate=0.01,
+            learning_rate=0.001,
             reward_decay=0.9,
             e_greedy=0.95,
             replace_target_iter=50,
@@ -58,7 +60,8 @@ class DeepQNetwork:
             self.memory_counter = 0
         else:
             self.memory = np.zeros((self.memory_size, each_batch_size))
-            pre_memory = np.fromfile('C:/bvr_ai/memory/dqn5.dat', dtype=float)
+            pre_memory = np.fromfile(mem_file, dtype=float)
+            #import code; code.interact(local=dict(globals(), **locals()))
             pre_memory = pre_memory.reshape(int(pre_memory.shape[0]/each_batch_size), each_batch_size)
             
             zlines = pre_memory[np.all(pre_memory == 0, axis=1)].shape[0]
@@ -109,7 +112,7 @@ class DeepQNetwork:
         # ------------------ build evaluate_net ------------------
         with tf.variable_scope('eval_net'):
 
-            e1 = tf.layers.dense(self.s, 20, tf.nn.tanh, kernel_initializer=w_initializer,
+            e1 = tf.layers.dense(self.s, 8, tf.nn.tanh, kernel_initializer=w_initializer,
                                  bias_initializer=b_initializer, name='e1')
             #eee1 = tf.layers.dense(e1, 10, tf.nn.relu, kernel_initializer=w_initializer,
             #                     bias_initializer=b_initializer, name='eee1')
@@ -118,7 +121,7 @@ class DeepQNetwork:
 
         # ------------------ build target_net ------------------
         with tf.variable_scope('target_net'):
-            t1 = tf.layers.dense(self.s_, 20, tf.nn.tanh, kernel_initializer=w_initializer,
+            t1 = tf.layers.dense(self.s_, 8, tf.nn.tanh, kernel_initializer=w_initializer,
                                  bias_initializer=b_initializer, name='t1')
             #ttt1 = tf.layers.dense(t1, 10, tf.nn.relu, kernel_initializer=w_initializer,
             #                     bias_initializer=b_initializer, name='ttt1')
@@ -135,8 +138,9 @@ class DeepQNetwork:
 
         with tf.variable_scope('loss'):
             self.loss = tf.reduce_mean(tf.squared_difference(self.q_target, self.q_eval_wrt_a, name='TD_error'))
+
         with tf.variable_scope('train'):
-            self._train_op = tf.train.RMSPropOptimizer(self.lr).minimize(self.loss)
+            self._train_op = tf.train.AdamOptimizer(learning_rate=self.lr).minimize(self.loss)
 
     def store_transition(self, s, a, r, s_):
         #if not hasattr(self, 'memory_counter'):
@@ -177,9 +181,9 @@ class DeepQNetwork:
             sample_index = np.random.choice(self.memory_size, size=self.batch_size)
         else:
             sample_index = np.random.choice(self.memory_counter, size=self.batch_size)
-        #import code; code.interact(local=dict(globals(), **locals()))
+        
         batch_memory = self.memory[sample_index, :]
-
+        #import code; code.interact(local=dict(globals(), **locals()))
         _, cost = self.sess.run(
             [self._train_op, self.loss],
             feed_dict={

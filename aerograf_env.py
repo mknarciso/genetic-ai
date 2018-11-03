@@ -79,4 +79,9 @@ class Aerograf(object):
 	def game_over(self):
 		if self.frame >= MAX_FRAME-STEP:
 			return True
+		full_path = self.path+"game_over.lock"
+		if os.path.exists(full_path):
+			#import code; code.interact(local=dict(globals(), **locals()))
+			os.remove(full_path)
+			return True
 		return False

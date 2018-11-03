@@ -11,11 +11,11 @@ import matplotlib.pyplot as plt
 
 ## Constants
 
-STATE_SPACE = 14
-ACTION_SPACE = 6
+STATE_SPACE = 6
+ACTION_SPACE = 4
 
 # Model
-l = [STATE_SPACE,20,ACTION_SPACE]
+l = [STATE_SPACE,8,ACTION_SPACE]
 # l[0] = 14  # Inputs
 # l[1] = 10
 # l[2] = 5
@@ -23,10 +23,10 @@ l = [STATE_SPACE,20,ACTION_SPACE]
 DNA_SIZE = (l[0]*l[1]+(l[1]+1)*l[2])
 
 # Genetics
-GENERATIONS = 100
+GENERATIONS = 15
 SPECIES = 15
 SURVIVORS = 4
-MUTATION = 0.02
+MUTATION = 0.2
 
 counter = 0
 generation = 0
@@ -37,7 +37,7 @@ element = 0
 
 ## Initial DNA
 #dnas = 2*np.random.random((SPECIES,DNA_SIZE)) - 1 # zero mean
-dnas = np.loadtxt('genetic2_solution.txt', dtype=float)
+dnas = np.loadtxt('genetic4_temp.txt', dtype=float)
 actual_best = np.zeros(DNA_SIZE)
 #import code; code.interact(local=dict(globals(), **locals()))
 
@@ -74,7 +74,7 @@ for generation in range(GENERATIONS):
 			p1 = ap.Autopilot(dnas[specie],[l[0],l[1],l[2]], explorer_chance=0.005)
 
 			state = env.reset(0)	
-			actions_count = np.zeros(6)
+			actions_count = np.zeros(4)
 			score = 0
 			start = time.clock()
 
@@ -85,7 +85,7 @@ for generation in range(GENERATIONS):
 				actions_count[action] += 1
 				score += reward
 				if done:
-					if score > 0:
+					if score > 100:
 						level += 1
 					else:
 						alive = False
@@ -94,12 +94,12 @@ for generation in range(GENERATIONS):
 					score_history.append(score)
 					result = "[Level: "+ str(level) + "][Final Score: " + str("%9.2f" % score) + "][Spent: "+str("%6.2f" % (end-start))+"s]"+str(actions_count)
 					print(result)
-					file = open("C:/bvr_ai/logs/genetic_log.txt","a") 
+					file = open("C:/bvr_ai/logs/genetic_log5.txt","a") 
 					file.write(result+"\n")
 					file.close()
 					break
 
-				scores[specie] += reward
+			scores[specie] += score
 		print("Final Score: " + str("%9.2f" % scores[specie])+ " [Level] " + str(level) + " [GEN] "+ str(generation)+ " [#] "+ str(specie)+"\n")
 		
 		#env.reset(0)
@@ -112,6 +112,9 @@ for generation in range(GENERATIONS):
 	actual_best = dnas[np.argmax(scores)]
 	dnas = gen.breed(selected_dnas, SURVIVORS, SPECIES, dyn_mut, DNA_SIZE)
 
+	b = dnas
+	np.savetxt('genetic5_temp.txt', b, fmt='%f')
+
 end_total = time.clock()		
 total = (end_total-start_total)
 
@@ -121,5 +124,5 @@ plt.xlabel('Generation')
 plt.show()
 
 a = dnas
-np.savetxt('genetic2_solution.txt', a, fmt='%f')
+np.savetxt('genetic5_final.txt', a, fmt='%f')
 print("Saved: " + str(dnas))
