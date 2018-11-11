@@ -30,16 +30,17 @@ RL = DeepQNetwork(n_actions=4,
 				  n_features=6,
                   #learning_rate=0.0008,
                   #reward_decay=0.995,
-                  e_greedy_start=0.9,
-                  e_greedy=0.99,
-            	  e_greedy_increment=0.0001,
+                  #e_greedy_start=0.9,
+                  e_greedy=0.98,
+            	  e_greedy_increment=0.00125,
                   #replace_target_iter=50,
                   #memory_size=100*episode_size,
+                  #permanent_memory_size=50*episode_size,
                   #batch_size=8*episode_size,
                   training=True,
                   save_file=this_path+"nn/dqn",
                   mem_file='C:/bvr_ai/memory/50_episodes_v10.dat',
-                  import_file=path+"results/dqn_24/nn/dqn",
+                  #import_file=path+"results/dqn_24/nn/dqn",
                   #e_exp_decay=0.002,
                   )
 
@@ -53,6 +54,7 @@ with open(this_path+"config.txt","w+") as f:
 	f.write("epsilon_max: "+str(RL.epsilon_max)+"\n")
 	f.write("replace_target_iter: "+str(RL.replace_target_iter)+"\n")
 	f.write("memory_size: "+str(RL.memory_size)+"\n")
+	f.write("permanent_memory_size: "+str(RL.permanent_memory_size)+"\n")
 	f.write("batch_size: "+str(RL.batch_size)+"\n")
 	f.write("epsilon_increment: "+str(RL.epsilon_increment)+"\n")
 	f.write("epsilon: "+str(RL.epsilon)+"\n")
@@ -128,7 +130,7 @@ try:
 		episode += 1
 except KeyboardInterrupt:
 	pass
-	
+
 end_total = time.clock()		
 total = (end_total-start_total)
 			

@@ -29,8 +29,9 @@ class DeepQNetwork:
             reward_decay=0.998,
             e_greedy=0.98,
             replace_target_iter=4*20, ## Troca a rede a cada 4 episódios
-            memory_size=50*episode_size,
-            batch_size=1*episode_size, ## Cara treinamento usa 4 episódios
+            memory_size=100*episode_size,
+            permanent_memory_size=50*episode_size,
+            batch_size=4*episode_size, ## Cara treinamento usa 4 episódios
             e_greedy_start=0,
             e_greedy_increment=None,
             e_exp_decay=None,
@@ -47,12 +48,14 @@ class DeepQNetwork:
         self.epsilon_max = e_greedy
         self.replace_target_iter = replace_target_iter
         self.memory_size = memory_size
+        self.permanent_memory_size = permanent_memory_size
         self.batch_size = batch_size
         self.epsilon_increment = e_greedy_increment
         self.epsilon = e_greedy_start if e_greedy_increment is not None else self.epsilon_max
         self.training = training
         self.save_file = save_file
         self.exp_eps_decay = e_exp_decay
+
         if e_exp_decay is not None:
             self.epsilon = 0 
 
@@ -164,6 +167,8 @@ class DeepQNetwork:
         index = self.memory_counter % self.memory_size
         self.memory[index, :] = transition
         self.memory_counter += 1
+        if self.permanent_memory_size > 0 and (self.memory_counter % self.memory_size) < self.permanent_memory_size:
+            self.memory_counter += self.permanent_memory_size
 
 
     def choose_action(self, observation):
