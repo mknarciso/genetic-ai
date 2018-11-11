@@ -2,15 +2,17 @@ import numpy as np
 import os
 import time
 
-times = 20
+times = 50
 n_features = 6
-memory_size = times*480
+memory_size = times*479
 path = "C:/bvr_ai/"
 memory = np.zeros((memory_size, n_features * 2 + 2))
 reward = 0
 _reward = 0
 state = np.zeros(n_features)
 _state = np.zeros(n_features)
+action = 0
+_action = 0
 memory_counter = 0
 
 for c in range(times):
@@ -29,7 +31,7 @@ for c in range(times):
 			file_in = open(state_path, 'r')
 			for i,y in enumerate(file_in.read().splitlines()):
 				if i==0:
-					reward = float(y)
+					_reward = float(y)
 				else:
 					_state[i-1] = float(y)
 			file_in.close()
@@ -38,18 +40,21 @@ for c in range(times):
 		if os.path.isfile(action_path):
 			file_in = open(action_path, 'r')
 			y = file_in.readline()
-			action = float(y)
+			_action = float(y)
 			file_in.close()
 			os.remove(action_path)
 
 		if not f==0:
-			transition = np.hstack((state, [action, reward], _state))
+			transition = np.hstack((state, [action, _reward], _state))
 			# replace the old memory with new memory
 			index = memory_counter % memory_size
 			memory[index, :] = transition
 			memory_counter += 1
+			print("[Frame: "+str(f-1)+"]"+str(transition))
 
 		state = _state
+		reward = _reward
+		action = _action
 
 		full_path = "C:/bvr_ai/game_over.lock"
 		if os.path.exists(full_path):
@@ -60,5 +65,5 @@ for c in range(times):
 			
 	print(c)
 
-memory.tofile('C:/bvr_ai/memory/dqn7.dat')
+memory.tofile('C:/bvr_ai/memory/50_episodes_v10.dat')
 print(memory)

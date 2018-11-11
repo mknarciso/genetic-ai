@@ -14,8 +14,8 @@ Tensorflow: r1.2
 import numpy as np
 import tensorflow as tf
 
-np.random.seed(1)
-tf.set_random_seed(7)
+np.random.seed(2)
+tf.set_random_seed(2)
 
 
 # Deep Q Network off-policy
@@ -112,20 +112,20 @@ class DeepQNetwork:
         # ------------------ build evaluate_net ------------------
         with tf.variable_scope('eval_net'):
 
-            e1 = tf.layers.dense(self.s, 8, tf.nn.tanh, kernel_initializer=w_initializer,
-                                 bias_initializer=b_initializer, name='e1')
+            #e1 = tf.layers.dense(self.s, 4, tf.nn.relu, kernel_initializer=w_initializer,
+            #                     bias_initializer=b_initializer, name='e1')
             #eee1 = tf.layers.dense(e1, 10, tf.nn.relu, kernel_initializer=w_initializer,
             #                     bias_initializer=b_initializer, name='eee1')
-            self.q_eval = tf.layers.dense(e1, self.n_actions , kernel_initializer=w_initializer,
+            self.q_eval = tf.layers.dense(self.s, self.n_actions, tf.nn.softmax, kernel_initializer=w_initializer,
                                           bias_initializer=b_initializer, name='q')
 
         # ------------------ build target_net ------------------
         with tf.variable_scope('target_net'):
-            t1 = tf.layers.dense(self.s_, 8, tf.nn.tanh, kernel_initializer=w_initializer,
-                                 bias_initializer=b_initializer, name='t1')
+            #t1 = tf.layers.dense(self.s_, 4, tf.nn.relu, kernel_initializer=w_initializer,
+            #                     bias_initializer=b_initializer, name='t1')
             #ttt1 = tf.layers.dense(t1, 10, tf.nn.relu, kernel_initializer=w_initializer,
             #                     bias_initializer=b_initializer, name='ttt1')
-            self.q_next = tf.layers.dense(t1, self.n_actions , kernel_initializer=w_initializer,
+            self.q_next = tf.layers.dense(self.s_, self.n_actions, tf.nn.softmax, kernel_initializer=w_initializer,
                                           bias_initializer=b_initializer, name='t2')
 
         with tf.variable_scope('q_target'):

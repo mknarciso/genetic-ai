@@ -15,7 +15,7 @@ STATE_SPACE = 6
 ACTION_SPACE = 4
 
 # Model
-l = [STATE_SPACE,8,ACTION_SPACE]
+l = [STATE_SPACE,4,ACTION_SPACE]
 # l[0] = 14  # Inputs
 # l[1] = 10
 # l[2] = 5
@@ -36,8 +36,8 @@ element = 0
 
 
 ## Initial DNA
-#dnas = 2*np.random.random((SPECIES,DNA_SIZE)) - 1 # zero mean
-dnas = np.loadtxt('genetic4_temp.txt', dtype=float)
+dnas = 2*np.random.random((SPECIES,DNA_SIZE)) - 1 # zero mean
+#dnas = np.loadtxt('genetic4_temp.txt', dtype=float)
 actual_best = np.zeros(DNA_SIZE)
 #import code; code.interact(local=dict(globals(), **locals()))
 

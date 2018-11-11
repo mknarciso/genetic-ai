@@ -15,8 +15,9 @@ import numpy as np
 import tensorflow as tf
 
 np.random.seed(1)
-tf.set_random_seed(7)
+tf.set_random_seed(1)
 
+episode_size = 479
 
 # Deep Q Network off-policy
 class DeepQNetwork:
@@ -24,13 +25,15 @@ class DeepQNetwork:
             self,
             n_actions,
             n_features,
-            learning_rate=0.001,
-            reward_decay=0.9,
-            e_greedy=0.95,
-            replace_target_iter=50,
-            memory_size=1000*480,
-            batch_size=32*480,
+            learning_rate=0.0000001,
+            reward_decay=0.998,
+            e_greedy=0.98,
+            replace_target_iter=4*20, ## Troca a rede a cada 4 episódios
+            memory_size=50*episode_size,
+            batch_size=1*episode_size, ## Cara treinamento usa 4 episódios
+            e_greedy_start=0,
             e_greedy_increment=None,
+            e_exp_decay=None,
             output_graph=False,
             training=False,
             import_file=None,
@@ -46,9 +49,12 @@ class DeepQNetwork:
         self.memory_size = memory_size
         self.batch_size = batch_size
         self.epsilon_increment = e_greedy_increment
-        self.epsilon = 0 if e_greedy_increment is not None else self.epsilon_max
+        self.epsilon = e_greedy_start if e_greedy_increment is not None else self.epsilon_max
         self.training = training
         self.save_file = save_file
+        self.exp_eps_decay = e_exp_decay
+        if e_exp_decay is not None:
+            self.epsilon = 0 
 
         # total learning step
         self.learn_step_counter = 0
@@ -65,6 +71,14 @@ class DeepQNetwork:
             pre_memory = pre_memory.reshape(int(pre_memory.shape[0]/each_batch_size), each_batch_size)
             
             zlines = pre_memory[np.all(pre_memory == 0, axis=1)].shape[0]
+            # if zlines%(episode_size+1) == 0:
+            #     c=zlines-1
+            #     step = episode_size
+            #     while c >= 0:
+            #         pre_memory = np.delete(pre_memory,c,0)
+            #         c = c-step
+            #         zlines = zlines - 1
+
             self.memory[:pre_memory.shape[0],:pre_memory.shape[1]] = pre_memory
             self.memory_counter = pre_memory.shape[0] - zlines
 
@@ -92,13 +106,13 @@ class DeepQNetwork:
         if import_file is not None:
             self.saver.restore(self.sess, import_file)
 
-        if mem_file is not None:
+        #if mem_file is not None:
             #import code; code.interact(local=dict(globals(), **locals()))
-            mem_range = int(self.memory[~np.all(self.memory == 0, axis=1)].shape[0]/48)
-            for c in range(mem_range):
-                print("Learnin from memory "+str(c)+" of "+ str(mem_range))
-                self.learn()
-                print("done")
+            #mem_range = int(self.memory[~np.all(self.memory == 0, axis=1)].shape[0]/48)
+            #for c in range(mem_range):
+            #    print("Learnin from memory "+str(c)+" of "+ str(mem_range))
+            #    self.learn()
+            #    print("done")
 
     def _build_net(self):
         # ------------------ all inputs ------------------------
@@ -112,20 +126,20 @@ class DeepQNetwork:
         # ------------------ build evaluate_net ------------------
         with tf.variable_scope('eval_net'):
 
-            e1 = tf.layers.dense(self.s, 8, tf.nn.tanh, kernel_initializer=w_initializer,
+            e1 = tf.layers.dense(self.s, 10, tf.nn.relu, kernel_initializer=w_initializer,
                                  bias_initializer=b_initializer, name='e1')
-            #eee1 = tf.layers.dense(e1, 10, tf.nn.relu, kernel_initializer=w_initializer,
+            #eee1 = tf.layers.dense(e1, 8, tf.nn.relu, kernel_initializer=w_initializer,
             #                     bias_initializer=b_initializer, name='eee1')
-            self.q_eval = tf.layers.dense(e1, self.n_actions , kernel_initializer=w_initializer,
+            self.q_eval = tf.layers.dense(e1, self.n_actions, kernel_initializer=w_initializer,
                                           bias_initializer=b_initializer, name='q')
 
         # ------------------ build target_net ------------------
         with tf.variable_scope('target_net'):
-            t1 = tf.layers.dense(self.s_, 8, tf.nn.tanh, kernel_initializer=w_initializer,
+            t1 = tf.layers.dense(self.s_, 10, tf.nn.relu, kernel_initializer=w_initializer,
                                  bias_initializer=b_initializer, name='t1')
-            #ttt1 = tf.layers.dense(t1, 10, tf.nn.relu, kernel_initializer=w_initializer,
+            #ttt1 = tf.layers.dense(t1, 8, tf.nn.relu, kernel_initializer=w_initializer,
             #                     bias_initializer=b_initializer, name='ttt1')
-            self.q_next = tf.layers.dense(t1, self.n_actions , kernel_initializer=w_initializer,
+            self.q_next = tf.layers.dense(t1, self.n_actions, kernel_initializer=w_initializer,
                                           bias_initializer=b_initializer, name='t2')
 
         with tf.variable_scope('q_target'):
@@ -196,19 +210,20 @@ class DeepQNetwork:
         self.cost_his.append(cost)
 
         # increasing epsilon
-        self.epsilon = self.epsilon + self.epsilon_increment if self.epsilon < self.epsilon_max else self.epsilon_max
+        if self.exp_eps_decay is None:
+            if self.epsilon < self.epsilon_max:
+                self.epsilon = self.epsilon + self.epsilon_increment  
+            else: 
+                self.epsilon = self.epsilon_max
+        else:
+            self.epsilon = 1 - np.power((1/(1+self.exp_eps_decay)),self.learn_step_counter)
         self.learn_step_counter += 1
 
         # save model
         if self.training:
             self.saver.save(self.sess, self.save_file)
 
-    def plot_cost(self):
-        import matplotlib.pyplot as plt
-        plt.plot(np.arange(len(self.cost_his)), self.cost_his)
-        plt.ylabel('Cost')
-        plt.xlabel('training steps')
-        plt.show()
 
-if __name__ == '__main__':
-    DQN = DeepQNetwork(3,4, output_graph=True)
+
+#if __name__ == '__main__':
+#    DQN = DeepQNetwork(3,4, output_graph=True)
