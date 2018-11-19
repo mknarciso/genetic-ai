@@ -1,15 +1,7 @@
 """
-This part of code is the Deep Q Network (DQN) brain.
-
-view the tensorboard picture about this DQN structure on: https://morvanzhou.github.io/tutorials/machine-learning/reinforcement-learning/4-3-DQN3/#modification
-
-View more on my tutorial page: https://morvanzhou.github.io/tutorials/
-
-Using:
-Tensorflow: r1.2
+Deep Q Network (DQN) implementation.
+Based on: https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/blob/master/contents/5_Deep_Q_Network/DQN_modified.py
 """
-
-# Smaller hidden layer
 
 import numpy as np
 import tensorflow as tf
@@ -28,18 +20,17 @@ class DeepQNetwork:
             learning_rate=0.0000001,
             reward_decay=0.998,
             e_greedy=0.98,
-            replace_target_iter=4*20, ## Troca a rede a cada 4 episódios
-            memory_size=100*episode_size,
-            permanent_memory_size=0,
-            batch_size=4*episode_size, ## Cara treinamento usa 4 episódios
-            e_greedy_start=0,
-            e_greedy_increment=None,
-            e_exp_decay=None,
-            output_graph=False,
-            training=False,
-            import_file=None,
-            save_file='saved/trained_dqn',
-            mem_file=None,
+            replace_target_iter=4*20,       # Replace network wights each 4 episodes
+            memory_size=100*episode_size,   # Memory capacity
+            permanent_memory_size=0,        # Memory that is not cleared
+            batch_size=4*episode_size,      # Episodes used in each train batch
+            e_greedy_start=0,               # Offset greedy start
+            e_greedy_increment=None,        # Epsilon increase step
+            e_exp_decay=None,               # Epsilon exponential decay rate
+            training=False,                 # Train the networks or keep weights static
+            import_file=None,               # Import pre treined network
+            save_file='saved/trained_dqn',  # Save network weights at the end
+            mem_file=None,                  # Preload memory file name
     ):
         self.n_actions = n_actions
         self.n_features = n_features
@@ -70,18 +61,8 @@ class DeepQNetwork:
         else:
             self.memory = np.zeros((self.memory_size, each_batch_size))
             pre_memory = np.fromfile(mem_file, dtype=float)
-            #import code; code.interact(local=dict(globals(), **locals()))
             pre_memory = pre_memory.reshape(int(pre_memory.shape[0]/each_batch_size), each_batch_size)
-            
             zlines = pre_memory[np.all(pre_memory == 0, axis=1)].shape[0]
-            # if zlines%(episode_size+1) == 0:
-            #     c=zlines-1
-            #     step = episode_size
-            #     while c >= 0:
-            #         pre_memory = np.delete(pre_memory,c,0)
-            #         c = c-step
-            #         zlines = zlines - 1
-
             self.memory[:pre_memory.shape[0],:pre_memory.shape[1]] = pre_memory
             self.memory_counter = pre_memory.shape[0] - zlines
 
@@ -94,45 +75,33 @@ class DeepQNetwork:
         with tf.variable_scope('soft_replacement'):
             self.target_replace_op = [tf.assign(t, e) for t, e in zip(t_params, e_params)]
 
-        
+        # Initialize TF
         self.saver = tf.train.Saver()   
-
         self.sess = tf.Session()
-
-        if output_graph:
-            # $ tensorboard --logdir=logs
-            tf.summary.FileWriter("logs/", self.sess.graph)
-
         self.sess.run(tf.global_variables_initializer())
         self.cost_his = []
 
         if import_file is not None:
             self.saver.restore(self.sess, import_file)
 
-        #if mem_file is not None:
-            #import code; code.interact(local=dict(globals(), **locals()))
-            #mem_range = int(self.memory[~np.all(self.memory == 0, axis=1)].shape[0]/48)
-            #for c in range(mem_range):
-            #    print("Learnin from memory "+str(c)+" of "+ str(mem_range))
-            #    self.learn()
-            #    print("done")
-
     def _build_net(self):
         # ------------------ all inputs ------------------------
-        self.s = tf.placeholder(tf.float32, [None, self.n_features], name='s')  # input State
-        self.s_ = tf.placeholder(tf.float32, [None, self.n_features], name='s_')  # input Next State
-        self.r = tf.placeholder(tf.float32, [None, ], name='r')  # input Reward
-        self.a = tf.placeholder(tf.int32, [None, ], name='a')  # input Action
+        # input State
+        self.s = tf.placeholder(tf.float32, [None, self.n_features], name='s')
+        # input Next State      
+        self.s_ = tf.placeholder(tf.float32, [None, self.n_features], name='s_')
+        # input Reward    
+        self.r = tf.placeholder(tf.float32, [None, ], name='r')
+        # input Action                     
+        self.a = tf.placeholder(tf.int32, [None, ], name='a')                       
 
+        # Weights random initializers
         w_initializer, b_initializer = tf.random_normal_initializer(0., 0.3), tf.constant_initializer(0.1)
  
         # ------------------ build evaluate_net ------------------
         with tf.variable_scope('eval_net'):
-
             e1 = tf.layers.dense(self.s, 10, tf.nn.relu, kernel_initializer=w_initializer,
                                  bias_initializer=b_initializer, name='e1')
-            #eee1 = tf.layers.dense(e1, 8, tf.nn.relu, kernel_initializer=w_initializer,
-            #                     bias_initializer=b_initializer, name='eee1')
             self.q_eval = tf.layers.dense(e1, self.n_actions, kernel_initializer=w_initializer,
                                           bias_initializer=b_initializer, name='q')
 
@@ -140,30 +109,31 @@ class DeepQNetwork:
         with tf.variable_scope('target_net'):
             t1 = tf.layers.dense(self.s_, 10, tf.nn.relu, kernel_initializer=w_initializer,
                                  bias_initializer=b_initializer, name='t1')
-            #ttt1 = tf.layers.dense(t1, 8, tf.nn.relu, kernel_initializer=w_initializer,
-            #                     bias_initializer=b_initializer, name='ttt1')
             self.q_next = tf.layers.dense(t1, self.n_actions, kernel_initializer=w_initializer,
                                           bias_initializer=b_initializer, name='t2')
 
+        # Target Action
         with tf.variable_scope('q_target'):
-            q_target = self.r + self.gamma * tf.reduce_max(self.q_next, axis=1, name='Qmax_s_')    # shape=(None, )
+            q_target = self.r + self.gamma * tf.reduce_max(self.q_next, axis=1, name='Qmax_s_')
             self.q_target = tf.stop_gradient(q_target)
 
+        # Eval Action
         with tf.variable_scope('q_eval'):
             a_indices = tf.stack([tf.range(tf.shape(self.a)[0], dtype=tf.int32), self.a], axis=1)
-            self.q_eval_wrt_a = tf.gather_nd(params=self.q_eval, indices=a_indices)    # shape=(None, )
+            self.q_eval_wrt_a = tf.gather_nd(params=self.q_eval, indices=a_indices)    
 
+        # Calculate MSE
         with tf.variable_scope('loss'):
             self.loss = tf.reduce_mean(tf.squared_difference(self.q_target, self.q_eval_wrt_a, name='TD_error'))
 
+        # Train the network with AdamOptimizer
         with tf.variable_scope('train'):
             self._train_op = tf.train.AdamOptimizer(learning_rate=self.lr).minimize(self.loss)
 
     def store_transition(self, s, a, r, s_):
-        #if not hasattr(self, 'memory_counter'):
-        #    self.memory_counter = 0
+        # Organize the tuple
         transition = np.hstack((s, [a, r], s_))
-        # replace the old memory with new memory
+        # Save to memory, replacing old ones if needed
         index = self.memory_counter % self.memory_size
         self.memory[index, :] = transition
         self.memory_counter += 1
@@ -178,9 +148,10 @@ class DeepQNetwork:
         if np.random.uniform() < self.epsilon:
             # forward feed the observation and get q value for every actions
             actions_value = self.sess.run(self.q_eval, feed_dict={self.s: observation})
-            #import code; code.interact(local=dict(globals(), **locals()))
+            # greedy select the action
             action = np.argmax(actions_value)
         else:
+            # random action
             action = np.random.randint(0, self.n_actions)
         return action
 
@@ -188,21 +159,15 @@ class DeepQNetwork:
         # check to replace target parameters
         if self.learn_step_counter % self.replace_target_iter == 0:
             self.sess.run(self.target_replace_op)
-            print('[epsilon: '+str("%6.4f" % self.epsilon)+'][Target params replaced!]')
-            #a = np.array([1, 2, 3, 4])
-            #np.savetxt('test1.txt', a, fmt='%d')
-            #b = np.loadtxt('test1.txt', dtype=int)
-            #self.memory.tofile('C:/bvr_ai/memory/dqn5.dat')
-            #c = np.fromfile('test2.dat', dtype=int)
+            #print('[epsilon: '+str("%6.4f" % self.epsilon)+'][Target params replaced!]')
 
         # sample batch memory from all memory
         if self.memory_counter > self.memory_size:
             sample_index = np.random.choice(self.memory_size, size=self.batch_size)
         else:
             sample_index = np.random.choice(self.memory_counter, size=self.batch_size)
-        
         batch_memory = self.memory[sample_index, :]
-        #import code; code.interact(local=dict(globals(), **locals()))
+        # Train 
         _, cost = self.sess.run(
             [self._train_op, self.loss],
             feed_dict={
@@ -227,8 +192,3 @@ class DeepQNetwork:
         # save model
         if self.training:
             self.saver.save(self.sess, self.save_file)
-
-
-
-#if __name__ == '__main__':
-#    DQN = DeepQNetwork(3,4, output_graph=True)

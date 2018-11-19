@@ -1,9 +1,6 @@
 """
-Aerograf DQN Interface
+Aerograf Environment Interface
 """
-
-## binding.pry
-#  import code; code.interact(local=dict(globals(), **locals()))
 
 import os
 import numpy as np 		# Mathematical library
@@ -26,7 +23,6 @@ class Aerograf(object):
 		self.frame = 0
 		self.reward = 0
 		self.read_state()
-		
 		return self.state
 
 	def step(self, action):
@@ -37,51 +33,52 @@ class Aerograf(object):
 		self.frame += STEP
 		#get next state from aerograf
 		self.read_state()
-
-		#if self.frame%500==0:
-		#	print("["+str(self.iteration)+"|"+str(self.frame)+"] ")
-		#print(self.state)
-		#print(self.action)
-		#print(self.reward)
-		
 		return self.state, self.reward, self.game_over()
 
 #	def render(self): 	
-#		self.player.move()
-#		self.enemy.move()
+#		Not implemented
 
 	def write_action(self):
+		# Set action filename
 		full_path = self.path+"bvr_action_"+str(self.frame)+".txt"
-		#old_path = self.path+"bvr_action_"+str(self.frame-STEP)+".txt"
-		#if os.path.exists(old_path):
-		#	os.remove(old_path)
+		# Lock semaphore
 		open(self.path+"dqn.lock", 'a').close()
+		# Write action
 		with open(full_path,"w") as file:
 			file.write(str(self.action))
+		# Release semaphore
 		os.remove(self.path+"dqn.lock")
 
 	def read_state(self):
+		# Set state filename
 		full_path = self.path+"bvr_state_"+str(self.frame)+".txt"
+		# Wait until file exists
 		while not os.path.exists(full_path):
 		    time.sleep(0.01)
+		# Wait Aerograf release semaphore
 		while os.path.exists(self.path+"aerograf.lock"):
 		    time.sleep(0.01)
+		# Read file
 		if os.path.isfile(full_path):
 			file_in = open(full_path, 'r')
 			for i,y in enumerate(file_in.read().splitlines()):
+				# First position is the reward
 				if i==0:
 					self.reward = float(y)
+				# The others are the next state
 				else:
 					self.state[i-1] = float(y)
 			file_in.close()
+		# Destroy file after reading it
 		os.remove(full_path)
 
 	def game_over(self):
+		# Check if episode is over by timeframe
 		if self.frame >= MAX_FRAME-STEP:
 			return True
+		# Or by existence of gameover file
 		full_path = self.path+"game_over.lock"
 		if os.path.exists(full_path):
-			#import code; code.interact(local=dict(globals(), **locals()))
 			os.remove(full_path)
 			return True
 		return False

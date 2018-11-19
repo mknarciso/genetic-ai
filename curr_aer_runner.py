@@ -31,17 +31,17 @@ RL = DeepQNetwork(n_actions=4,
                   #learning_rate=0.0008,
                   #reward_decay=0.995,
                   #e_greedy_start=0.9,
-                  e_greedy=0.98,
+                  e_greedy=0.985,
             	  #e_greedy_increment=0.00125,
                   #replace_target_iter=50,
-                  #memory_size=100*episode_size,
-                  #permanent_memory_size=50*episode_size,
+                  memory_size=100*episode_size,
+                  permanent_memory_size=50*episode_size,
                   #batch_size=8*episode_size,
-                  training=False,
+                  training=True,
                   save_file=this_path+"nn/dqn",
-                  #mem_file='C:/bvr_ai/memory/50_episodes_v10.dat',
+                  mem_file='C:/bvr_ai/memory/50_episodes_v10.dat',
                   import_file=path+"results/dqn_44/nn/dqn",
-                  #e_exp_decay=0.002,
+                  #e_exp_decay=0.0009,
                   )
 
 #Log initial configs
@@ -71,6 +71,8 @@ start_total = time.clock()
 level_counter = np.zeros(9)
 level_wins = np.zeros(9)
 level = 0
+acc_level = 0
+acc_wins = 0
 try:
 	while True:
 		step = 0
@@ -107,23 +109,30 @@ try:
 				end = time.clock()
 				env.write_action()
 				score_history.append(score)
-				result = "[Ep: "+ str(episode) + "][Sc: " + str("%6.2f" % score) + "][Lv: "+ str(level) + "][AvgLast5Lv: "+ str("%6.4f" % (sum(lost_at[-5:])/5.)) + "][AvgLv: "+ str("%6.4f" % (sum(lost_at)/float(len(lost_at)))) + "]"+str(level_wins)+str(level_counter)+str(actions_count)+"[Spent: "+str("%6.2f" % (end-start))+"s]"
+				#result = "[Ep: "+ str(episode) + "][Sc: " + str("%6.2f" % score) + "][Lv: "+ str(level) + "][AvgLast5Lv: "+ str("%6.4f" % (sum(lost_at[-5:])/5.)) + "][AvgLv: "+ str("%6.4f" % (sum(lost_at)/float(len(lost_at)))) + "]"+str(level_wins)+str(level_counter)+str(actions_count)+"[Spent: "+str("%6.2f" % (end-start))+"s]"
+				result = "[Ep: "+ str(episode) + "][Sc: " + str("%6.2f" % score) + "][Lv: "+ str(level) + "][Acc_wins: "+ str(acc_wins) + "]"+str(level_wins)+str(level_counter)+str(actions_count)+"[Spent: "+str("%6.2f" % (end-start))+"s]"
 				print(result)
 				file = open(this_path+"log.txt","a+") 
 				file.write(result+"\n")
 				file.close()
-				if score >= 1:
-					level_wins[level] += 1
-					#level += 1
-					#if level > 8:
-					#	level = 0
+				if acc_level > 8:
+					if score >= 1:
+						level_wins[level] += 1
+						level += 1
+						if level > 8:
+							level = 0
+					else:
+						lost_at.append(level)
+						avg_lvl.append(sum(lost_at)/float(len(lost_at)))
+						level = 0
 				else:
-					lost_at.append(level)
-					avg_lvl.append(sum(lost_at)/float(len(lost_at)))
-					#level = 0
-				level += 1
-				if level > 8:
-					level = 0
+					if score>=1:
+						acc_wins += 1;
+						level_wins[level] += 1
+					if acc_wins > 20:
+						acc_wins = 0;
+						level += 1;   
+						acc_level += 1;
 				break
 			step += 1
 		#import code; code.interact(local=dict(globals(), **locals()))
