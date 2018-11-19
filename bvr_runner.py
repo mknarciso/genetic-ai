@@ -196,5 +196,10 @@ with open(this_path+"final_log.txt","w+") as f:
 	f.write(str(score_history)+"\n\n")
 	f.write("Lost at Level:\n")
 	f.write(str(lost_at)+"\n\n")
+	f.write("Level counter:\n")
+	f.write(str(level_counter)+"\n\n")
+	f.write("Level Wins:\n")
+	f.write(str(level_wins)+"\n\n")
+
 
 print('game over')
